@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Paint.CameraSystem;
+using UnityEngine;
 
 namespace Paint.General
 {
@@ -7,8 +8,10 @@ namespace Paint.General
         public static GameManager Instance { get; private set; }
 
         public AssetsLibrary AssetsLibrary;
+        public CameraController CameraController;
 
-        public Characters.Character PlayerCharacter;
+        public Characters.Character PlayerCharacter { get; private set; }
+        public bool IsActive { get; private set; }
 
         void Awake()
         {
@@ -20,13 +23,23 @@ namespace Paint.General
 
         void Start()
         {
+            Initialize();
             CreatePlayer();
+
+            IsActive = true;
+        }
+
+        void Initialize()
+        {
+            CameraController.Init();
         }
 
         void CreatePlayer()
         {
             PlayerCharacter = Instantiate(AssetsLibrary.Library_Prefabs.PlayerCharacterPrefab, Vector3.zero, Quaternion.identity);
             PlayerCharacter.Init();
+
+            CameraController.SetTarget(PlayerCharacter.transform);
         }
     }
 }
