@@ -10,7 +10,7 @@ namespace Paint.CameraSystem
     [RequireComponent(typeof(CameraBehaviour_FollowTarget))]
     public class CameraController : MonoBehaviour
     {
-        public System.Action OnCameraArrived;
+        public System.Action OnCameraFinishedAligning;
 
         public Vector3 InitCameraOffset = new Vector3(0, 12, -10);
 
@@ -35,7 +35,7 @@ namespace Paint.CameraSystem
         {
             m_Target = target;
 
-            /// Выровнять камеру согласно отступу
+            //Выровнять камеру согласно отступу
             m_Behaviour_OffsetAlign.OnFinished += StartFollowingTarget;
             m_Behaviour_OffsetAlign.AlignToOffset(m_Target, InitCameraOffset);
         }
@@ -47,6 +47,8 @@ namespace Paint.CameraSystem
         {
             m_Behaviour_OffsetAlign.OnFinished -= StartFollowingTarget;
             m_Behaviour_FollowTarget.Follow(m_Target, CacheOffset());
+
+            OnCameraFinishedAligning?.Invoke();
         }
 
 

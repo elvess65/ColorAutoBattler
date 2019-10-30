@@ -1,4 +1,5 @@
 ﻿using Paint.CameraSystem;
+using Paint.InputSystem;
 using UnityEngine;
 
 namespace Paint.General
@@ -9,6 +10,7 @@ namespace Paint.General
 
         public AssetsLibrary AssetsLibrary;
         public CameraController CameraController;
+        public InputManager InputManager;
 
         public Characters.Character PlayerCharacter { get; private set; }
         public bool IsActive { get; private set; }
@@ -25,12 +27,12 @@ namespace Paint.General
         {
             Initialize();
             CreatePlayer();
-
-            IsActive = true;
+            StartLoop();
         }
 
         void Initialize()
         {
+            InputManager.Init();
             CameraController.Init();
         }
 
@@ -39,7 +41,22 @@ namespace Paint.General
             PlayerCharacter = Instantiate(AssetsLibrary.Library_Prefabs.PlayerCharacterPrefab, Vector3.zero, Quaternion.identity);
             PlayerCharacter.Init();
 
+            InputManager.OnMove += (Vector2 dir) => PlayerCharacter.GetMoveDiretion(dir);
+        }
+
+        void StartLoop()
+        {
+            CameraController.OnCameraFinishedAligning += HandleCameraFinishedAligning;
             CameraController.SetTarget(PlayerCharacter.transform);
+            
+            IsActive = true;
+        }
+
+        void HandleCameraFinishedAligning()
+        {
+            CameraController.OnCameraFinishedAligning -= HandleCameraFinishedAligning;
+
+            InputManager.InputIsEnabled = true;
         }
     }
 }

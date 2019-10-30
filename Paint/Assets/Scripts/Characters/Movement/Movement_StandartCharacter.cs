@@ -20,7 +20,7 @@ namespace Paint.Characters.Movement
         }
 
 
-        public void Move(Vector3 mDir) => m_Target.Translate(mDir * m_MoveSpeed * Time.deltaTime);
+        public void Move(Vector3 mDir) => m_Target.Translate(mDir * m_MoveSpeed * Time.deltaTime, Space.World);
 
         public void Rotate(float angle)
         {

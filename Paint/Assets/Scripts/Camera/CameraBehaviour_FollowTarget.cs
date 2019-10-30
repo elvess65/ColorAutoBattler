@@ -2,6 +2,9 @@
 
 namespace Paint.CameraSystem
 {
+    /// <summary>
+    /// Поведение камеры - следования за целью
+    /// </summary>
     public class CameraBehaviour_FollowTarget : MonoBehaviour
     {
         public System.Action OnFinished;
