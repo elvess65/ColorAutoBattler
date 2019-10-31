@@ -10,6 +10,7 @@ namespace Paint.InputSystem
     {
         public System.Action<bool> OnInputStateChange;
         public System.Action<Vector2> OnMove;
+        public System.Action<Vector2> OnShoot;
 
         private BaseInputManager m_CurrentInput;
         private bool m_InputIsEnabledState = false;
@@ -33,21 +34,26 @@ namespace Paint.InputSystem
         {
             m_CurrentInput = new KeyboardInputManager();
             m_CurrentInput.OnMove += CallMoveEvent;
+            m_CurrentInput.OnShoot += CallShootEvent;
         }
-
-        void CallMoveEvent(Vector2 mDir) => OnMove?.Invoke(mDir);
 
         void Update()
         {
             if (GameManager.Instance.IsActive && m_InputIsEnabledState)
                 m_CurrentInput.UpdateInput();
         }
+
+
+        void CallMoveEvent(Vector2 mDir) => OnMove?.Invoke(mDir);
+
+        void CallShootEvent(Vector2 sDir) => OnShoot?.Invoke(sDir);
     }
 
 
     public abstract class BaseInputManager
     {
         public System.Action<Vector2> OnMove;
+        public System.Action<Vector2> OnShoot;
 
         public abstract void UpdateInput();
     }

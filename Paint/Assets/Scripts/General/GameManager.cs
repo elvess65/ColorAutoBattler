@@ -15,6 +15,7 @@ namespace Paint.General
         public Characters.Character PlayerCharacter { get; private set; }
         public bool IsActive { get; private set; }
 
+
         void Awake()
         {
             if (Instance != null)
@@ -30,6 +31,7 @@ namespace Paint.General
             StartLoop();
         }
 
+
         void Initialize()
         {
             InputManager.Init();
@@ -41,7 +43,8 @@ namespace Paint.General
             PlayerCharacter = Instantiate(AssetsLibrary.Library_Prefabs.PlayerCharacterPrefab, Vector3.zero, Quaternion.identity);
             PlayerCharacter.Init();
 
-            InputManager.OnMove += (Vector2 dir) => PlayerCharacter.GetMoveDiretion(dir);
+            InputManager.OnMove += (Vector2 dir) => PlayerCharacter.SetMoveDiretion(dir);
+            InputManager.OnShoot += (Vector2 dir) => PlayerCharacter.Shoot(dir);
         }
 
         void StartLoop()
@@ -51,6 +54,7 @@ namespace Paint.General
             
             IsActive = true;
         }
+
 
         void HandleCameraFinishedAligning()
         {

@@ -5,7 +5,7 @@ namespace Paint.Characters.Animation
     /// <summary>
     /// Класс, отвечающий за анимацию стандартного персонажа
     /// </summary>
-    public class StandartCharacterAnimationController : MonoBehaviour
+    public class Animation_StandartCharacter : MonoBehaviour, iAnimation
     {
         public Actions AnimationActionsController;
         public Animator AnimationController;
@@ -42,7 +42,22 @@ namespace Paint.Characters.Animation
                 m_IsMoving = false;
             }
         }
-       
+
+
+        public void PlayAimAnimation()
+        {
+            if (m_IsMoving)
+                m_IsMoving = false;
+
+            AnimationActionsController.Aiming();
+        }
+
+        public void PlayShootAnimation() => AnimationActionsController.Attack();
+
+        public void PlayCooldownAnimation() { }
+
+        public void PlayFinishShootAnimation() { AnimationActionsController.Stay(); } 
+
 
         void SetArsenal(string name)
         {
