@@ -124,6 +124,16 @@ namespace Paint.Characters
                 ProcessShooting();
         }
 
+        protected virtual void OnTriggerEnter(Collider collider)
+        {
+            Projectiles.Projectile projectile = collider.GetComponent<Projectiles.Projectile>();
+            if (projectile != null)
+            {
+                TakeDamage(projectile.Type, projectile.Damage);
+                projectile.Collide();
+            }
+        }
+
 
         void ProcessMovement()
         {

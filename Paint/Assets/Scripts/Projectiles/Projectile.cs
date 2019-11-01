@@ -1,10 +1,14 @@
-﻿using Paint.General;
+﻿using Paint.Character.Weapon;
+using Paint.General;
 using UnityEngine;
 
 namespace Paint.Projectiles
 {
     public class Projectile : MonoBehaviour
     {
+        public WeaponTypes Type => WeaponTypes.Red;
+        public int Damage => 2;
+        
         private Vector3 m_MoveDir;
         private float m_Speed = 5;
         private float m_LifeTime = 1;
@@ -12,11 +16,15 @@ namespace Paint.Projectiles
 
         private bool isActive = false;
 
+
         public void Launch(Vector2 dir)
         {
             m_MoveDir = new Vector3(dir.x, 0, dir.y);
             isActive = true;
         }
+
+        public void Collide() => Destroy(gameObject);
+
 
         void Update()
         {
