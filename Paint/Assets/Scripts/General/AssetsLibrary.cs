@@ -10,6 +10,8 @@ namespace Paint.General
         public class PrefabsLibrary
         {
             public Characters.Character PlayerCharacterPrefab;
+            public Characters.Character ManekenCharacterPrefab;
+            public Characters.Character TurrentCharacterPrefab;
             public Projectiles.Projectile ProjectilePrefab;
 
             public Character.Health.UI.UIHealthBarController UIHealthBarPrefab;

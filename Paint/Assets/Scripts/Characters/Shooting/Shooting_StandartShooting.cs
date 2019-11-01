@@ -1,8 +1,12 @@
 ﻿using System;
+using Paint.Character.Weapon;
 using UnityEngine;
 
 namespace Paint.Characters.Shooting
 {
+    /// <summary>
+    /// Стандартная стрельба
+    /// </summary>
     public class Shooting_StandartShooting : iShooting
     {
         public event Action OnRotation;
@@ -14,6 +18,8 @@ namespace Paint.Characters.Shooting
         public bool IsShooting => m_ShootPhaseTracker.CurrentPhase != ShootPhase.Phases.None;
         public float AngleToRotateBeforeAim { get; set; }
         public Vector2 ShootDir { get; set; }
+        public WeaponTypes WeaponType { get => WeaponTypes.Red; set { } }
+        public int Damage { get => 2; set { } }
 
         private float[] m_PhaseTimes;
         private Transform m_CharacterTransform;

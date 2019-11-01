@@ -26,6 +26,7 @@ namespace Paint.Characters
         protected iShooting m_ShootBehaviour;
         protected iAnimation m_AnimationBehaviour;
         protected iHealth m_HealthBehaviour;
+        protected Collider m_CollisionCollider;
 
         public bool IsMoving => m_TargetMoveDir.sqrMagnitude > 0;
         public bool IsDestroyed { get; private set; }
@@ -34,6 +35,11 @@ namespace Paint.Characters
         public virtual void Init()
         {
             IsDestroyed = false;
+
+            if (m_CollisionCollider == null)
+                m_CollisionCollider = GetComponent<Collider>();
+
+            m_CollisionCollider.enabled = true;
 
             m_AnimationBehaviour = GetComponent<iAnimation>();
             m_AnimationBehaviour.Init();
@@ -80,35 +86,30 @@ namespace Paint.Characters
         public void TakeDamage(WeaponTypes type, int damage) => m_HealthBehaviour.TakeDamage(type, damage);
 
 
-        void HandleShootEvent_Rotation() { m_AnimationBehaviour.PlayAimAnimation(); }
+        protected virtual void HandleShootEvent_Rotation() { m_AnimationBehaviour.PlayAimAnimation(); }
 
-        void HandleShootEvent_Aim() { m_AnimationBehaviour.PlayAimAnimation(); }
+        protected virtual void HandleShootEvent_Aim() { m_AnimationBehaviour.PlayAimAnimation(); }
 
-        void HandleShootEvent_Shoot()
-        {
-            m_AnimationBehaviour.PlayShootAnimation();
+        protected virtual void HandleShootEvent_Shoot() { m_AnimationBehaviour.PlayShootAnimation(); }
 
-            Projectiles.Projectile projectile = Instantiate(GameManager.Instance.AssetsLibrary.Library_Prefabs.ProjectilePrefab);
-            projectile.transform.position = ProjectileSpawnPoint.position;
-            projectile.Launch(m_ShootBehaviour.ShootDir);
-        }
+        protected virtual void HandleShootEvent_Cooldown() { m_AnimationBehaviour.PlayCooldownAnimation(); }
 
-        void HandleShootEvent_Cooldown() { m_AnimationBehaviour.PlayCooldownAnimation(); }
-
-        void HandleShootEvent_Finish() { m_AnimationBehaviour.PlayFinishShootAnimation(); }
+        protected virtual void HandleShootEvent_Finish() { m_AnimationBehaviour.PlayFinishShootAnimation(); }
 
 
-        void HandleDamageEvent_TakeDamage(WeaponTypes type, int damage) { m_AnimationBehaviour.PlayDamageAnimation(); }
+        protected virtual void HandleDamageEvent_TakeDamage(WeaponTypes type, int damage) { m_AnimationBehaviour.PlayDamageAnimation(); }
 
-        void HandleDamageEvent_Destroy()
+        protected virtual void HandleDamageEvent_Destroy()
         {
             m_AnimationBehaviour.PlayDestroyAnimation();
+
+            m_CollisionCollider.enabled = false;
             IsDestroyed = true;
 
             OnDestroy?.Invoke();
         }
 
-        void HandleDamageEvent_WrongType(WeaponTypes type) { Debug.Log("WrongType"); }
+        protected virtual void HandleDamageEvent_WrongType(WeaponTypes type) { Debug.Log("WrongType"); }
 
 
 

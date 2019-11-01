@@ -6,9 +6,9 @@ namespace Paint.Projectiles
 {
     public class Projectile : MonoBehaviour
     {
-        public WeaponTypes Type => WeaponTypes.Red;
-        public int Damage => 2;
-        
+        public WeaponTypes Type { get; private set; }
+        public int Damage { get; private set; }
+
         private Vector3 m_MoveDir;
         private float m_Speed = 5;
         private float m_LifeTime = 1;
@@ -17,9 +17,12 @@ namespace Paint.Projectiles
         private bool isActive = false;
 
 
-        public void Launch(Vector2 dir)
+        public void Launch(WeaponTypes type, Vector2 dir, int damage)
         {
+            Type = type;
+            Damage = damage;
             m_MoveDir = new Vector3(dir.x, 0, dir.y);
+
             isActive = true;
         }
 

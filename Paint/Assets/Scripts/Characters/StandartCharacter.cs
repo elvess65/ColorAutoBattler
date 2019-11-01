@@ -2,6 +2,7 @@
 using Paint.Character.Weapon;
 using Paint.Characters.Movement;
 using Paint.Characters.Shooting;
+using Paint.General;
 using System.Collections.Generic;
 
 namespace Paint.Characters
@@ -32,6 +33,15 @@ namespace Paint.Characters
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
 
             base.Init();
+        }
+
+        protected override void HandleShootEvent_Shoot()
+        {
+            base.HandleShootEvent_Shoot();
+
+            Projectiles.Projectile projectile = Instantiate(GameManager.Instance.AssetsLibrary.Library_Prefabs.ProjectilePrefab);
+            projectile.transform.position = ProjectileSpawnPoint.position;
+            projectile.Launch(m_ShootBehaviour.WeaponType, m_ShootBehaviour.ShootDir, m_ShootBehaviour.Damage);
         }
     }
 }

@@ -28,6 +28,8 @@ namespace Paint.General
         {
             Initialize();
             CreatePlayer();
+            CreateManeken();
+            CreateTurrent();
             StartLoop();
         }
 
@@ -46,6 +48,24 @@ namespace Paint.General
 
             InputManager.OnMove += (Vector2 dir) => PlayerCharacter.SetMoveDiretion(dir);
             InputManager.OnShoot += (Vector2 dir) => PlayerCharacter.Shoot(dir);
+        }
+
+        void CreateManeken()
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                Characters.Character maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, new Vector3(-3 + i * 3, 0, 4), Quaternion.identity);
+                maneken.Init();
+            }
+        }
+
+        void CreateTurrent()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                Characters.Character turrent = Instantiate(AssetsLibrary.Library_Prefabs.TurrentCharacterPrefab, new Vector3(-2 + i * 4, 0, -4), Quaternion.identity);
+                turrent.Init();
+            }
         }
 
         void StartLoop()

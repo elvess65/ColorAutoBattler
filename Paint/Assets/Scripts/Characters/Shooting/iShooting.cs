@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Paint.Character.Weapon;
+using UnityEngine;
 
 namespace Paint.Characters.Shooting
 {
@@ -12,6 +13,8 @@ namespace Paint.Characters.Shooting
 
         bool IsShooting { get; }
         Vector2 ShootDir { get; set; }
+        WeaponTypes WeaponType { get; set; }
+        int Damage { get; set; }
         float AngleToRotateBeforeAim { get; set; }
 
         void StartShoot(Vector2 sDir);

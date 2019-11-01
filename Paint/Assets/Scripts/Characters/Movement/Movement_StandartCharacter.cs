@@ -20,9 +20,9 @@ namespace Paint.Characters.Movement
         }
 
 
-        public void Move(Vector3 mDir) => m_Target.Translate(mDir * m_MoveSpeed * Time.deltaTime, Space.World);
+        public virtual void Move(Vector3 mDir) => m_Target.Translate(mDir * m_MoveSpeed * Time.deltaTime, Space.World);
 
-        public void Rotate(float angle)
+        public virtual void Rotate(float angle)
         {
             Quaternion targetRot = Quaternion.AngleAxis(angle, Vector3.up);
             m_Target.rotation = Quaternion.Lerp(m_Target.rotation, targetRot, Time.deltaTime * m_RotationSpeed);
