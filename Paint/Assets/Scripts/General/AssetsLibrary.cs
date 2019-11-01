@@ -1,5 +1,4 @@
-﻿using Paint.Characters;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Paint.General
 {
@@ -10,7 +9,11 @@ namespace Paint.General
         [System.Serializable]
         public class PrefabsLibrary
         {
-            public Character PlayerCharacterPrefab;
+            public Characters.Character PlayerCharacterPrefab;
+            public Projectiles.Projectile ProjectilePrefab;
+
+            public Character.Health.UI.UIHealthBarController UIHealthBarPrefab;
+            public Character.Health.UI.UIHealthBarSegment UIHealthBarSegmentPrefab;
         }
     }
 }

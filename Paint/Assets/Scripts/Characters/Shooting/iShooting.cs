@@ -11,6 +11,7 @@ namespace Paint.Characters.Shooting
         event System.Action OnFinish;
 
         bool IsShooting { get; }
+        Vector2 ShootDir { get; set; }
         float AngleToRotateBeforeAim { get; set; }
 
         void StartShoot(Vector2 sDir);

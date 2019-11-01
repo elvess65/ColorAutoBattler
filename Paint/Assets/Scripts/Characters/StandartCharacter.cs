@@ -1,5 +1,8 @@
-﻿using Paint.Characters.Movement;
+﻿using Paint.Character.Health;
+using Paint.Character.Weapon;
+using Paint.Characters.Movement;
 using Paint.Characters.Shooting;
+using System.Collections.Generic;
 
 namespace Paint.Characters
 {
@@ -17,8 +20,16 @@ namespace Paint.Characters
 
         public override void Init()
         {
+            List<(WeaponTypes type, int health)> healthData = new List<(WeaponTypes type, int health)>()
+            {
+                (WeaponTypes.Red, 1),
+                (WeaponTypes.Green, 2),
+                (WeaponTypes.Blue, 3),
+            };
+
             m_MoveBehaviour = new Movement_StandartCharacter(transform, m_MOVE_SPEED, m_ROTATION_SPEED);
             m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, transform);
+            m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
 
             base.Init();
         }

@@ -11,5 +11,8 @@
         void PlayShootAnimation();
         void PlayCooldownAnimation();
         void PlayFinishShootAnimation();
+
+        void PlayDamageAnimation();
+        void PlayDestroyAnimation();
     }
 }

@@ -13,10 +13,10 @@ namespace Paint.Characters.Shooting
 
         public bool IsShooting => m_ShootPhaseTracker.CurrentPhase != ShootPhase.Phases.None;
         public float AngleToRotateBeforeAim { get; set; }
+        public Vector2 ShootDir { get; set; }
 
         private float[] m_PhaseTimes;
         private Transform m_CharacterTransform;
-        private Vector2 m_ShootDir;
         private ShootPhase m_ShootPhaseTracker;
 
         private const float m_DELTA_ANGLE_TO_DIR = 1f;
@@ -32,7 +32,7 @@ namespace Paint.Characters.Shooting
 
         public void StartShoot(Vector2 sDir)
         {
-            m_ShootDir = sDir;
+            ShootDir = sDir;
 
             GoToNextPhase();
         }
@@ -48,7 +48,7 @@ namespace Paint.Characters.Shooting
             if (m_ShootPhaseTracker.CurrentPhase != ShootPhase.Phases.Rotating)
                 return true;
 
-            bool isLookingAtShootDir = GetAnglePlayerAndDir(m_ShootDir) <= m_DELTA_ANGLE_TO_DIR;
+            bool isLookingAtShootDir = GetAnglePlayerAndDir(ShootDir) <= m_DELTA_ANGLE_TO_DIR;
 
             if (isLookingAtShootDir)
                 GoToNextPhase();
@@ -80,7 +80,7 @@ namespace Paint.Characters.Shooting
 
                         if (!IsLookingAtShootDir())
                         {
-                            AngleToRotateBeforeAim = Mathf.Atan2(m_ShootDir.x, m_ShootDir.y) * Mathf.Rad2Deg;
+                            AngleToRotateBeforeAim = Mathf.Atan2(ShootDir.x, ShootDir.y) * Mathf.Rad2Deg;
                             OnRotation?.Invoke();
                         }
 

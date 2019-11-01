@@ -56,7 +56,12 @@ namespace Paint.Characters.Animation
 
         public void PlayCooldownAnimation() { }
 
-        public void PlayFinishShootAnimation() { AnimationActionsController.Stay(); } 
+        public void PlayFinishShootAnimation() { AnimationActionsController.Stay(); }
+
+
+        public void PlayDestroyAnimation() => AnimationActionsController.Death();
+
+        public void PlayDamageAnimation() => AnimationActionsController.Damage();
 
 
         void SetArsenal(string name)

@@ -41,6 +41,7 @@ namespace Paint.General
         void CreatePlayer()
         {
             PlayerCharacter = Instantiate(AssetsLibrary.Library_Prefabs.PlayerCharacterPrefab, Vector3.zero, Quaternion.identity);
+            PlayerCharacter.OnDestroy += () => InputManager.InputIsEnabled = false; 
             PlayerCharacter.Init();
 
             InputManager.OnMove += (Vector2 dir) => PlayerCharacter.SetMoveDiretion(dir);
