@@ -17,15 +17,17 @@ namespace Paint.Characters
         private const float m_AIM_TIME = 0.3f;
         private const float m_SHOOT_TIME = 0.1f;
         private const float m_COOLDOWN_TIME = 0.2f;
+        private const int m_DAMAGE = 1;
 
         public override void Init((WeaponTypes type, int health)[] healthData)
         {
             m_MoveBehaviour = new Movement_StandartCharacter(transform, m_MOVE_SPEED, m_ROTATION_SPEED);
-            m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, transform);
+            m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, m_DAMAGE, transform);
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
 
             base.Init(healthData);
         }
+
 
         protected override void HandleShootEvent_Shoot()
         {

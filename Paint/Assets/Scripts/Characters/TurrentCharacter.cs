@@ -23,6 +23,7 @@ namespace Paint.Characters
         private const float m_TIME_BETWEEN_SHOOTS_MIN = 2;
         private const float m_TIME_BETWEEN_SHOOTS_MAX = 4;
         private const float m_DISTANCE_TO_ATTACK = 3.5f;
+        private const int m_DAMAGE = 5;
 
         private float m_ShootTime = 0;
 
@@ -30,7 +31,7 @@ namespace Paint.Characters
         public override void Init((WeaponTypes type, int health)[] healthData)
         {
             m_MoveBehaviour = new Movement_RotationOnly(RotationObject, m_ROTATION_SPEED);
-            m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, RotationObject);
+            m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, m_DAMAGE, RotationObject);
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
 
             SelectWeaponType((WeaponTypes)Random.Range(0, (int)WeaponTypes.Max));

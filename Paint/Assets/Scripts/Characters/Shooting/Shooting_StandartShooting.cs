@@ -19,7 +19,7 @@ namespace Paint.Characters.Shooting
         public float AngleToRotateBeforeAim { get; set; }
         public Vector2 ShootDir { get; set; }
         public WeaponTypes WeaponType { get; set; }
-        public int Damage { get => 2; set { } }
+        public int Damage { get; set; }
 
         private float[] m_PhaseTimes;
         private Transform m_CharacterTransform;
@@ -28,9 +28,11 @@ namespace Paint.Characters.Shooting
         private const float m_DELTA_ANGLE_TO_DIR = 1f;
 
 
-        public Shooting_StandartShooting(float aimingTime, float shootTime, float cooldownTime, Transform characterTransform)
+        public Shooting_StandartShooting(float aimingTime, float shootTime, float cooldownTime, int damage, Transform characterTransform)
         {
             m_CharacterTransform = characterTransform;
+            Damage = damage;
+
             m_PhaseTimes = new float[] { aimingTime, shootTime, cooldownTime };
             m_ShootPhaseTracker = new ShootPhase();
         }
