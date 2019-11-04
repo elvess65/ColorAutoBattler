@@ -38,6 +38,7 @@ namespace Paint.Projectiles
                     color = Color.blue;
                     break;
                 case WeaponTypes.Yellow:
+                    color = Color.yellow;
                     break;
             }
 
