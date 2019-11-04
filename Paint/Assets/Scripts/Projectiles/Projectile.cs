@@ -6,6 +6,8 @@ namespace Paint.Projectiles
 {
     public class Projectile : MonoBehaviour
     {
+        public MeshRenderer ProjectileRebderer;
+
         public WeaponTypes Type { get; private set; }
         public int Damage { get; private set; }
 
@@ -22,6 +24,24 @@ namespace Paint.Projectiles
             Type = type;
             Damage = damage;
             m_MoveDir = new Vector3(dir.x, 0, dir.y);
+
+            Color color = Color.gray;
+            switch(type)
+            {
+                case WeaponTypes.Red:
+                    color = Color.red;
+                    break;
+                case WeaponTypes.Green:
+                    color = Color.green;
+                    break;
+                case WeaponTypes.Blue:
+                    color = Color.blue;
+                    break;
+                case WeaponTypes.Yellow:
+                    break;
+            }
+
+            ProjectileRebderer.material.color = color;
 
             isActive = true;
         }

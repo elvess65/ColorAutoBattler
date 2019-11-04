@@ -28,6 +28,9 @@ namespace Paint.Characters.Shooting
         public void ProcessShooting()
         { }
 
+        public void SetWeaponType(WeaponTypes type)
+        { }
+
         public void StartShoot(Vector2 sDir)
         { }
     }

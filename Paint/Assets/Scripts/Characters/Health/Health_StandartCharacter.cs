@@ -34,11 +34,11 @@ namespace Paint.Character.Health
         }
 
 
-        public Health_StandartCharacter(List<(WeaponTypes type, int health)> healthData, Transform healthBarSpawnPoint, Transform followTarget)
+        public Health_StandartCharacter((WeaponTypes type, int health)[] healthData, Transform healthBarSpawnPoint, Transform followTarget)
         {
             //Инициализировать данные
             m_HealthData = new Dictionary<WeaponTypes, HealthSegment>();
-            for (int i = 0; i < healthData.Count; i++)
+            for (int i = 0; i < healthData.Length; i++)
             {
                 if (!m_HealthData.ContainsKey(healthData[i].type))
                 {

@@ -18,7 +18,7 @@ namespace Paint.Characters.Shooting
         public bool IsShooting => m_ShootPhaseTracker.CurrentPhase != ShootPhase.Phases.None;
         public float AngleToRotateBeforeAim { get; set; }
         public Vector2 ShootDir { get; set; }
-        public WeaponTypes WeaponType { get => WeaponTypes.Red; set { } }
+        public WeaponTypes WeaponType { get; set; }
         public int Damage { get => 2; set { } }
 
         private float[] m_PhaseTimes;
@@ -42,6 +42,8 @@ namespace Paint.Characters.Shooting
 
             GoToNextPhase();
         }
+
+        public void SetWeaponType(WeaponTypes type) => WeaponType = type;
 
         public void ProcessShooting()
         {

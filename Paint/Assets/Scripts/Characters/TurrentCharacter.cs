@@ -3,7 +3,6 @@ using Paint.Character.Weapon;
 using Paint.Characters.Movement;
 using Paint.Characters.Shooting;
 using Paint.General;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paint.Characters
@@ -23,24 +22,22 @@ namespace Paint.Characters
         private const float m_COOLDOWN_TIME = 0.5f;
         private const float m_TIME_BETWEEN_SHOOTS_MIN = 2;
         private const float m_TIME_BETWEEN_SHOOTS_MAX = 4;
+        private const float m_DISTANCE_TO_ATTACK = 3.5f;
 
         private float m_ShootTime = 0;
 
 
-        public override void Init()
+        public override void Init((WeaponTypes type, int health)[] healthData)
         {
-            List<(WeaponTypes type, int health)> healthData = new List<(WeaponTypes type, int health)>()
-            {
-                (WeaponTypes.Red, 5),
-            };
-
             m_MoveBehaviour = new Movement_RotationOnly(RotationObject, m_ROTATION_SPEED);
             m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, RotationObject);
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
 
+            SelectWeaponType((WeaponTypes)Random.Range(0, (int)WeaponTypes.Max));
+
             m_ShootTime = Time.time + GetRandomTimeBetweenShoots();
 
-            base.Init();
+            base.Init(healthData);
         }
 
 
@@ -57,15 +54,19 @@ namespace Paint.Characters
 
         protected override void Update()
         {
-            Vector3 dir2Player = (GameManager.Instance.PlayerCharacter.transform.position - transform.position).normalized;
+            Vector3 dir2Player = GameManager.Instance.PlayerCharacter.transform.position - transform.position;
+            Vector3 dir2PlayerNormalized = dir2Player.normalized;
 
             if (!m_ShootBehaviour.IsShooting)
-                m_TargetRotAngle = Mathf.Atan2(dir2Player.x, dir2Player.z) * Mathf.Rad2Deg;
+                m_TargetRotAngle = Mathf.Atan2(dir2PlayerNormalized.x, dir2PlayerNormalized.z) * Mathf.Rad2Deg;
 
-            if (Time.time >= m_ShootTime)
+            if (dir2Player.magnitude <= m_DISTANCE_TO_ATTACK)
             {
-                m_ShootTime = Time.time + GetRandomTimeBetweenShoots();
-                Shoot(new Vector2(dir2Player.x, dir2Player.z));
+                if (Time.time >= m_ShootTime)
+                {
+                    m_ShootTime = Time.time + GetRandomTimeBetweenShoots();
+                    Shoot(new Vector2(dir2PlayerNormalized.x, dir2PlayerNormalized.z));
+                }
             }
 
             base.Update();

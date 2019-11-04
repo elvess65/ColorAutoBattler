@@ -18,6 +18,7 @@ namespace Paint.Characters.Shooting
         float AngleToRotateBeforeAim { get; set; }
 
         void StartShoot(Vector2 sDir);
+        void SetWeaponType(WeaponTypes type);
         void ProcessShooting();
 
         bool IsLookingAtShootDir();

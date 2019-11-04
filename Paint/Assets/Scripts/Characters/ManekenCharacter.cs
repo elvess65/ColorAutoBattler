@@ -3,7 +3,6 @@ using Paint.Character.Weapon;
 using Paint.Characters.Movement;
 using Paint.Characters.Shooting;
 using Paint.General;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paint.Characters
@@ -15,18 +14,13 @@ namespace Paint.Characters
     {
         private const float m_ROTATION_SPEED = 15;
 
-        public override void Init()
+        public override void Init((WeaponTypes type, int health)[] healthData)
         {
-            List<(WeaponTypes type, int health)> healthData = new List<(WeaponTypes type, int health)>()
-            {
-                (WeaponTypes.Red, 5),
-            };
-
             m_MoveBehaviour = new Movement_RotationOnly(transform, m_ROTATION_SPEED);
             m_ShootBehaviour = new Shooting_None();
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
 
-            base.Init();
+            base.Init(healthData);
         }
 
         protected override void Update()

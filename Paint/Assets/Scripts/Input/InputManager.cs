@@ -1,4 +1,5 @@
-﻿using Paint.General;
+﻿using Paint.Character.Weapon;
+using Paint.General;
 using UnityEngine;
 
 namespace Paint.InputSystem
@@ -11,6 +12,7 @@ namespace Paint.InputSystem
         public System.Action<bool> OnInputStateChange;
         public System.Action<Vector2> OnMove;
         public System.Action<Vector2> OnShoot;
+        public System.Action<WeaponTypes> OnWeaponTypeChange;
 
         private BaseInputManager m_CurrentInput;
         private bool m_InputIsEnabledState = false;
@@ -35,6 +37,7 @@ namespace Paint.InputSystem
             m_CurrentInput = new KeyboardInputManager();
             m_CurrentInput.OnMove += CallMoveEvent;
             m_CurrentInput.OnShoot += CallShootEvent;
+            m_CurrentInput.OnWeaponTypeChange += CallWeaponTypeChangeEvent;
         }
 
         void Update()
@@ -47,6 +50,8 @@ namespace Paint.InputSystem
         void CallMoveEvent(Vector2 mDir) => OnMove?.Invoke(mDir);
 
         void CallShootEvent(Vector2 sDir) => OnShoot?.Invoke(sDir);
+
+        void CallWeaponTypeChangeEvent(WeaponTypes wType) => OnWeaponTypeChange?.Invoke(wType);
     }
 
 
@@ -54,6 +59,7 @@ namespace Paint.InputSystem
     {
         public System.Action<Vector2> OnMove;
         public System.Action<Vector2> OnShoot;
+        public System.Action<WeaponTypes> OnWeaponTypeChange;
 
         public abstract void UpdateInput();
     }

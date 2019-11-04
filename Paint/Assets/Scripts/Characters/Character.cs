@@ -32,7 +32,7 @@ namespace Paint.Characters
         public bool IsDestroyed { get; private set; }
 
 
-        public virtual void Init()
+        public virtual void Init((WeaponTypes type, int health)[] healthData)
         {
             IsDestroyed = false;
 
@@ -83,6 +83,12 @@ namespace Paint.Characters
             m_TargetRotAngle = Mathf.Atan2(sDir.x, sDir.y) * Mathf.Rad2Deg;
         }
 
+        public void SelectWeaponType(WeaponTypes type)
+        {
+            if (!m_ShootBehaviour.IsShooting)
+                m_ShootBehaviour.SetWeaponType(type);
+        }
+
         public void TakeDamage(WeaponTypes type, int damage) => m_HealthBehaviour.TakeDamage(type, damage);
 
 
@@ -109,7 +115,7 @@ namespace Paint.Characters
             OnDestroy?.Invoke();
         }
 
-        protected virtual void HandleDamageEvent_WrongType(WeaponTypes type) { Debug.Log("WrongType"); }
+        protected virtual void HandleDamageEvent_WrongType(WeaponTypes type) { }
 
 
 

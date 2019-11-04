@@ -3,7 +3,6 @@ using Paint.Character.Weapon;
 using Paint.Characters.Movement;
 using Paint.Characters.Shooting;
 using Paint.General;
-using System.Collections.Generic;
 
 namespace Paint.Characters
 {
@@ -19,20 +18,13 @@ namespace Paint.Characters
         private const float m_SHOOT_TIME = 0.1f;
         private const float m_COOLDOWN_TIME = 0.2f;
 
-        public override void Init()
+        public override void Init((WeaponTypes type, int health)[] healthData)
         {
-            List<(WeaponTypes type, int health)> healthData = new List<(WeaponTypes type, int health)>()
-            {
-                (WeaponTypes.Red, 1),
-                (WeaponTypes.Green, 2),
-                (WeaponTypes.Blue, 3),
-            };
-
             m_MoveBehaviour = new Movement_StandartCharacter(transform, m_MOVE_SPEED, m_ROTATION_SPEED);
             m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, transform);
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
 
-            base.Init();
+            base.Init(healthData);
         }
 
         protected override void HandleShootEvent_Shoot()

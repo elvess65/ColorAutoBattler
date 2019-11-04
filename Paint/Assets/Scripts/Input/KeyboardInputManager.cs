@@ -11,6 +11,15 @@ namespace Paint.InputSystem
 
             if (Input.GetMouseButtonDown(0))
                 OnShoot?.Invoke(GetDirFromScreenCenterToMouse().normalized);
+
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Red);
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Green);
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Blue);
         }
 
         Vector2 GetDirFromScreenCenterToMouse()

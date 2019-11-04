@@ -7,5 +7,5 @@ namespace Paint.Character.Weapon
         
     }
 
-    public enum WeaponTypes { Red, Green, Blue, Yellow }
+    public enum WeaponTypes { Red, Green, Blue, Yellow, Max }
 }
