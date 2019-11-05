@@ -13,6 +13,7 @@ namespace Paint.InputSystem
         public System.Action<Vector2> OnMove;
         public System.Action<Vector2> OnShoot;
         public System.Action<WeaponTypes> OnWeaponTypeChange;
+        public System.Action OnShieldActivate;
 
         private BaseInputManager m_CurrentInput;
         private bool m_InputIsEnabledState = false;
@@ -38,6 +39,7 @@ namespace Paint.InputSystem
             m_CurrentInput.OnMove += CallMoveEvent;
             m_CurrentInput.OnShoot += CallShootEvent;
             m_CurrentInput.OnWeaponTypeChange += CallWeaponTypeChangeEvent;
+            m_CurrentInput.OnShieldActivate += CallShieldActivateEvent;
         }
 
         void Update()
@@ -52,6 +54,8 @@ namespace Paint.InputSystem
         void CallShootEvent(Vector2 sDir) => OnShoot?.Invoke(sDir);
 
         void CallWeaponTypeChangeEvent(WeaponTypes wType) => OnWeaponTypeChange?.Invoke(wType);
+
+        void CallShieldActivateEvent() => OnShieldActivate?.Invoke();
     }
 
 
@@ -60,6 +64,7 @@ namespace Paint.InputSystem
         public System.Action<Vector2> OnMove;
         public System.Action<Vector2> OnShoot;
         public System.Action<WeaponTypes> OnWeaponTypeChange;
+        public System.Action OnShieldActivate;
 
         public abstract void UpdateInput();
     }

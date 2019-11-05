@@ -14,5 +14,8 @@
 
         void PlayDamageAnimation();
         void PlayDestroyAnimation();
+
+        void PlayShieldActivatedAnimation();
+        void PlayShieldDeactivatedAnimation();
     }
 }

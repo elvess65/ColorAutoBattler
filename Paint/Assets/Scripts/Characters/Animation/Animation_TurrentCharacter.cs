@@ -33,5 +33,11 @@ namespace Paint.Characters.Animation
 
         public void PlayStayAnimation()
         { }
+
+        public void PlayShieldActivatedAnimation()
+        { }
+
+        public void PlayShieldDeactivatedAnimation()
+        { }
     }
 }

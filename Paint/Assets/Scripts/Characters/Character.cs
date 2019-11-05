@@ -2,8 +2,8 @@
 using Paint.Character.Weapon;
 using Paint.Characters.Animation;
 using Paint.Characters.Movement;
+using Paint.Characters.Shield;
 using Paint.Characters.Shooting;
-using Paint.General;
 using UnityEngine;
 
 namespace Paint.Characters
@@ -26,10 +26,15 @@ namespace Paint.Characters
         protected iShooting m_ShootBehaviour;
         protected iAnimation m_AnimationBehaviour;
         protected iHealth m_HealthBehaviour;
+        protected iShield m_ShieldBehaviour;
         protected Collider m_CollisionCollider;
 
-        public bool IsMoving => m_TargetMoveDir.sqrMagnitude > 0;
         public bool IsDestroyed { get; private set; }
+        public bool IsMoving => m_TargetMoveDir.sqrMagnitude > 0;
+        
+        private bool CanMove => !m_ShootBehaviour.IsShooting && !m_ShieldBehaviour.IsShieldActivated;           //Перемещение - не стреляет и не под щитом
+        private bool CanShoot => !m_ShootBehaviour.IsShooting && !m_ShieldBehaviour.IsShieldActivated;          //Выстрел - не стреляет и не под щитом
+        private bool CanActivateShield => !m_ShieldBehaviour.IsShieldActivated && !m_ShootBehaviour.IsShooting; //Щит -  - не стреляет и не под щитом
 
 
         public virtual void Init((WeaponTypes type, int health)[] healthData)
@@ -53,6 +58,9 @@ namespace Paint.Characters
             m_HealthBehaviour.OnTakeDamage += HandleDamageEvent_TakeDamage;
             m_HealthBehaviour.OnDestroy += HandleDamageEvent_Destroy;
             m_HealthBehaviour.OnWrongType += HandleDamageEvent_WrongType;
+
+            m_ShieldBehaviour.OnShieldActivated += HandleShieldActivated;
+            m_ShieldBehaviour.OnShieldDeactivated += HandleShieldDeactivated;
         }
 
 
@@ -74,7 +82,7 @@ namespace Paint.Characters
 
         public void Shoot(Vector2 sDir)
         {
-            if (m_ShootBehaviour.IsShooting)
+            if (!CanShoot)
                 return;
 
             m_ShootBehaviour.StartShoot(sDir);
@@ -83,13 +91,28 @@ namespace Paint.Characters
             m_TargetRotAngle = Mathf.Atan2(sDir.x, sDir.y) * Mathf.Rad2Deg;
         }
 
+        public void ShieldActivate()
+        {
+            if (!CanActivateShield)
+                return;
+
+            m_ShieldBehaviour.ActivateShield();
+        }
+
         public void SelectWeaponType(WeaponTypes type)
         {
             if (!m_ShootBehaviour.IsShooting)
+            {
                 m_ShootBehaviour.SetWeaponType(type);
+                m_ShieldBehaviour.SetWeaponType(type);
+            }
         }
 
-        public void TakeDamage(WeaponTypes type, int damage) => m_HealthBehaviour.TakeDamage(type, damage);
+        public void TakeDamage(WeaponTypes type, int damage)
+        {
+            if (!ShieldIsValid(type))
+                m_HealthBehaviour.TakeDamage(type, damage);
+        }
 
 
         protected virtual void HandleShootEvent_Rotation() { m_AnimationBehaviour.PlayAimAnimation(); }
@@ -118,17 +141,29 @@ namespace Paint.Characters
         protected virtual void HandleDamageEvent_WrongType(WeaponTypes type) { }
 
 
+        protected virtual void HandleShieldActivated()
+        {
+            m_AnimationBehaviour.PlayStayAnimation();
+            m_AnimationBehaviour.PlayShieldActivatedAnimation();
+        }
+
+        protected virtual void HandleShieldDeactivated() => m_AnimationBehaviour.PlayShieldDeactivatedAnimation();
+
 
         protected virtual void Update()
         {
             if (IsDestroyed)
                 return;
 
-            //Можно перемещатся только если не стреляешь
-            if (!m_ShootBehaviour.IsShooting)
+            if (CanMove)
                 ProcessMovement();
             else 
-                ProcessShooting();
+            {
+                if (m_ShootBehaviour.IsShooting)
+                    ProcessShooting();
+                else if (m_ShieldBehaviour.IsShieldActivated)
+                    ProcessShield();
+            }
         }
 
         protected virtual void OnTriggerEnter(Collider collider)
@@ -160,5 +195,10 @@ namespace Paint.Characters
             if (!m_ShootBehaviour.IsLookingAtShootDir())
                 m_MoveBehaviour.Rotate(m_ShootBehaviour.AngleToRotateBeforeAim);
         }
+
+        void ProcessShield() => m_ShieldBehaviour.ProcessShield();
+
+
+        bool ShieldIsValid(WeaponTypes type) => m_ShieldBehaviour.IsShieldActivated && m_ShieldBehaviour.WeaponType == type;
     }
 }

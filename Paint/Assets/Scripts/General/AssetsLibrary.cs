@@ -13,6 +13,7 @@ namespace Paint.General
             public Characters.Character ManekenCharacterPrefab;
             public Characters.Character TurrentCharacterPrefab;
             public Projectiles.Projectile ProjectilePrefab;
+            public Shields.Shield ShieldPrefab;
 
             public Character.Health.UI.UIHealthBarController UIHealthBarPrefab;
             public Character.Health.UI.UIHealthBarSegment UIHealthBarSegmentPrefab;

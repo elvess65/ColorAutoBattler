@@ -64,6 +64,11 @@ namespace Paint.Characters.Animation
         public void PlayDamageAnimation() => AnimationActionsController.Damage();
 
 
+        public void PlayShieldActivatedAnimation() => AnimationActionsController.Sitting();
+
+        public void PlayShieldDeactivatedAnimation() => AnimationActionsController.Sitting();
+
+
         void SetArsenal(string name)
         {
             foreach (Arsenal hand in ArsenalList)

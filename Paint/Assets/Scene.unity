@@ -468,6 +468,8 @@ MonoBehaviour:
       type: 3}
     ProjectilePrefab: {fileID: 986694142156284400, guid: 7dfe24be20a78824c80ee815d54e1ec1,
       type: 3}
+    ShieldPrefab: {fileID: 3950196403441561640, guid: 46cd3cdac86405e409418ac122cb41cd,
+      type: 3}
     UIHealthBarPrefab: {fileID: 52143090030708078, guid: 88424b119d24b7046930d4141ad972a6,
       type: 3}
     UIHealthBarSegmentPrefab: {fileID: 114645438117021352, guid: f3b5dbef40bd6b140ba9ab5d071ef9e6,

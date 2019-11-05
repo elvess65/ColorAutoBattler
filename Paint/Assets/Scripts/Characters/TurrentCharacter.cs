@@ -1,6 +1,7 @@
 ﻿using Paint.Character.Health;
 using Paint.Character.Weapon;
 using Paint.Characters.Movement;
+using Paint.Characters.Shield;
 using Paint.Characters.Shooting;
 using Paint.General;
 using UnityEngine;
@@ -33,6 +34,7 @@ namespace Paint.Characters
             m_MoveBehaviour = new Movement_RotationOnly(RotationObject, m_ROTATION_SPEED);
             m_ShootBehaviour = new Shooting_StandartShooting(m_AIM_TIME, m_SHOOT_TIME, m_COOLDOWN_TIME, m_DAMAGE, RotationObject);
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
+            m_ShieldBehaviour = new Shield_None();
 
             SelectWeaponType((WeaponTypes)Random.Range(0, (int)WeaponTypes.Max));
 

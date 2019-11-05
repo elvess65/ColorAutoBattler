@@ -1,6 +1,7 @@
 ﻿using Paint.Character.Health;
 using Paint.Character.Weapon;
 using Paint.Characters.Movement;
+using Paint.Characters.Shield;
 using Paint.Characters.Shooting;
 using Paint.General;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace Paint.Characters
             m_MoveBehaviour = new Movement_RotationOnly(transform, m_ROTATION_SPEED);
             m_ShootBehaviour = new Shooting_None();
             m_HealthBehaviour = new Health_StandartCharacter(healthData, HealthBarSpawnPoint, transform);
+            m_ShieldBehaviour = new Shield_None();
 
             base.Init(healthData);
         }

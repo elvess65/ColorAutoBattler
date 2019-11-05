@@ -20,6 +20,9 @@ namespace Paint.InputSystem
 
             if (Input.GetKeyDown(KeyCode.Alpha3))
                 OnWeaponTypeChange(Character.Weapon.WeaponTypes.Blue);
+
+            if (Input.GetKeyDown(KeyCode.Space))
+                OnShieldActivate?.Invoke();
         }
 
         Vector2 GetDirFromScreenCenterToMouse()

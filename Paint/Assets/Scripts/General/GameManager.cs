@@ -57,6 +57,7 @@ namespace Paint.General
             InputManager.OnMove += PlayerCharacter.SetMoveDiretion;
             InputManager.OnShoot += PlayerCharacter.Shoot;
             InputManager.OnWeaponTypeChange += PlayerCharacter.SelectWeaponType;
+            InputManager.OnShieldActivate += PlayerCharacter.ShieldActivate;
         }
 
         void CreateManeken()
