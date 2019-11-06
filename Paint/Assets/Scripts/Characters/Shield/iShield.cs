@@ -4,7 +4,7 @@ namespace Paint.Characters.Shield
 {
     public interface iShield
     {
-        event System.Action OnShieldActivated;
+        event System.Action<WeaponTypes> OnShieldActivated;
         event System.Action OnShieldDeactivated;
 
         bool IsShieldActivated { get; }

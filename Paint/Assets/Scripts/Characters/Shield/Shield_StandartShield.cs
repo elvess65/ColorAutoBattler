@@ -9,7 +9,7 @@ namespace Paint.Characters.Shield
     /// </summary>
     public class Shield_StandartShield : iShield
     {
-        public event Action OnShieldActivated;
+        public event Action<WeaponTypes> OnShieldActivated;
         public event Action OnShieldDeactivated;
 
         public bool IsShieldActivated => m_ShieldIsActivated;
@@ -31,7 +31,7 @@ namespace Paint.Characters.Shield
             m_DeactivationTime = Time.time + m_Duration;
             m_ShieldIsActivated = true;
 
-            OnShieldActivated?.Invoke();
+            OnShieldActivated?.Invoke(WeaponType);
         }
 
         public void ProcessShield()

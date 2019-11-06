@@ -26,6 +26,8 @@ namespace Paint.Shields
                     break;
             }
 
+            color = new Color(color.r, color.g, color.b, 0.25f);
+
             ShieldRebderer.material.color = color;
         }
     }

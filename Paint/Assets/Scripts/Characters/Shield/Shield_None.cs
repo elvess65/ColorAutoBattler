@@ -11,7 +11,7 @@ namespace Paint.Characters.Shield
         public bool IsShieldActivated => false; 
         public WeaponTypes WeaponType => WeaponTypes.Max;
 
-        public event Action OnShieldActivated;
+        public event Action<WeaponTypes> OnShieldActivated;
         public event Action OnShieldDeactivated;
 
         public void ActivateShield()

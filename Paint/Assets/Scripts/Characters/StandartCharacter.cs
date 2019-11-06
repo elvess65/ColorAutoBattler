@@ -41,5 +41,22 @@ namespace Paint.Characters
             projectile.transform.position = ProjectileSpawnPoint.position;
             projectile.Launch(m_ShootBehaviour.WeaponType, m_ShootBehaviour.ShootDir, m_ShootBehaviour.Damage);
         }
+
+        private Shields.Shield m_Shield; 
+        protected override void HandleShieldActivated(WeaponTypes type)
+        {
+            base.HandleShieldActivated(type);
+
+            m_Shield = Instantiate(GameManager.Instance.AssetsLibrary.Library_Prefabs.ShieldPrefab);
+            m_Shield.transform.position = transform.position;
+            m_Shield.Init(type);
+        }
+
+        protected override void HandleShieldDeactivated()
+        {
+            base.HandleShieldDeactivated();
+
+            Destroy(m_Shield.gameObject);
+        }
     }
 }

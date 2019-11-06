@@ -141,7 +141,7 @@ namespace Paint.Characters
         protected virtual void HandleDamageEvent_WrongType(WeaponTypes type) { }
 
 
-        protected virtual void HandleShieldActivated()
+        protected virtual void HandleShieldActivated(WeaponTypes type)
         {
             m_AnimationBehaviour.PlayStayAnimation();
             m_AnimationBehaviour.PlayShieldActivatedAnimation();

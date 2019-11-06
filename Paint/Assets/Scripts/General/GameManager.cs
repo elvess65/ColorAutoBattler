@@ -13,6 +13,10 @@ namespace Paint.General
         public CameraController CameraController;
         public InputManager InputManager;
 
+        public Transform PlayerSpawnPoint;
+        public Transform[] ManekenSpawnPoints;
+        public Transform[] TurrentSpawnPoints;
+
         public Characters.Character PlayerCharacter { get; private set; }
         public bool IsActive { get; private set; }
 
@@ -50,7 +54,7 @@ namespace Paint.General
                 (WeaponTypes.Blue, 3),
             };
 
-            PlayerCharacter = Instantiate(AssetsLibrary.Library_Prefabs.PlayerCharacterPrefab, Vector3.zero, Quaternion.identity);
+            PlayerCharacter = Instantiate(AssetsLibrary.Library_Prefabs.PlayerCharacterPrefab, PlayerSpawnPoint.position, Quaternion.identity);
             PlayerCharacter.OnDestroy += () => InputManager.InputIsEnabled = false; 
             PlayerCharacter.Init(healthData);
 
@@ -69,7 +73,7 @@ namespace Paint.General
                 (WeaponTypes.Red, 3),
             };
 
-            Characters.Character maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, new Vector3(-3 + i * 3, 0, 4), Quaternion.identity);
+            Characters.Character maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, ManekenSpawnPoints[i].position, Quaternion.identity);
             maneken.Init(healthData);
             i++;
 
@@ -79,7 +83,7 @@ namespace Paint.General
                 (WeaponTypes.Green, 3),
             };
 
-            maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, new Vector3(-3 + i * 3, 0, 4), Quaternion.identity);
+            maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, ManekenSpawnPoints[i].position, Quaternion.identity);
             maneken.Init(healthData);
             i++;
 
@@ -89,7 +93,7 @@ namespace Paint.General
                 (WeaponTypes.Blue, 3),
             };
 
-            maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, new Vector3(-3 + i * 3, 0, 4), Quaternion.identity);
+            maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, ManekenSpawnPoints[i].position, Quaternion.identity);
             maneken.Init(healthData);
             i++;
         }
@@ -104,7 +108,7 @@ namespace Paint.General
                 (WeaponTypes.Green, 2),
             };
 
-            Characters.Character turrent = Instantiate(AssetsLibrary.Library_Prefabs.TurrentCharacterPrefab, new Vector3(-2 + i * 4, 0, -4), Quaternion.identity);
+            Characters.Character turrent = Instantiate(AssetsLibrary.Library_Prefabs.TurrentCharacterPrefab, TurrentSpawnPoints[i].position, Quaternion.identity);
             turrent.Init(healthData);
             i++;
 
@@ -115,7 +119,7 @@ namespace Paint.General
                 (WeaponTypes.Blue, 3),
             };
 
-            turrent = Instantiate(AssetsLibrary.Library_Prefabs.TurrentCharacterPrefab, new Vector3(-2 + i * 4, 0, -4), Quaternion.identity);
+            turrent = Instantiate(AssetsLibrary.Library_Prefabs.TurrentCharacterPrefab, TurrentSpawnPoints[i].position, Quaternion.identity);
             turrent.Init(healthData);
             i++;
         }

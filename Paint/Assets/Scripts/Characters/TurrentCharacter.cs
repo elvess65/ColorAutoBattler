@@ -23,7 +23,7 @@ namespace Paint.Characters
         private const float m_COOLDOWN_TIME = 0.5f;
         private const float m_TIME_BETWEEN_SHOOTS_MIN = 2;
         private const float m_TIME_BETWEEN_SHOOTS_MAX = 4;
-        private const float m_DISTANCE_TO_ATTACK = 3.5f;
+        private const float m_DISTANCE_TO_ATTACK = 5f;
         private const int m_DAMAGE = 5;
 
         private float m_ShootTime = 0;
