@@ -12,6 +12,8 @@ namespace Paint.Characters
     /// </summary>
     public class StandartCharacter : Character
     {
+        private Shields.Shield m_Shield;
+
         private const float m_MOVE_SPEED = 3;
         private const float m_ROTATION_SPEED = 15;
 
@@ -21,6 +23,7 @@ namespace Paint.Characters
         private const int m_DAMAGE = 1;
 
         private const float m_SHIELD_DURATION = 1;
+
 
         public override void Init((WeaponTypes type, int health)[] healthData)
         {
@@ -42,7 +45,6 @@ namespace Paint.Characters
             projectile.Launch(m_ShootBehaviour.WeaponType, m_ShootBehaviour.ShootDir, m_ShootBehaviour.Damage);
         }
 
-        private Shields.Shield m_Shield; 
         protected override void HandleShieldActivated(WeaponTypes type)
         {
             base.HandleShieldActivated(type);

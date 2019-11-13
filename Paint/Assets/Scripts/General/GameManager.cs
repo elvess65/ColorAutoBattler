@@ -1,6 +1,7 @@
 ﻿using Paint.CameraSystem;
 using Paint.Character.Weapon;
 using Paint.InputSystem;
+using Paint.Match;
 using UnityEngine;
 
 namespace Paint.General
@@ -12,11 +13,13 @@ namespace Paint.General
         public AssetsLibrary AssetsLibrary;
         public CameraController CameraController;
         public InputManager InputManager;
+        public UIWindow_CharacterSelection UIWindow_Selection;
 
         public Transform PlayerSpawnPoint;
         public Transform[] ManekenSpawnPoints;
         public Transform[] TurrentSpawnPoints;
 
+        public MatchManager MatchManager { get; private set; }
         public Characters.Character PlayerCharacter { get; private set; }
         public bool IsActive { get; private set; }
 
@@ -35,7 +38,8 @@ namespace Paint.General
             CreatePlayer();
             CreateManeken();
             CreateTurrent();
-            StartLoop();
+            CreateMatch();
+            //StartLoop();
         }
 
 
@@ -130,6 +134,18 @@ namespace Paint.General
             CameraController.SetTarget(PlayerCharacter.transform);
             
             IsActive = true;
+        }
+
+        void CreateMatch()
+        {
+            MatchManager = new MatchManager();
+
+            int[] playerIDs = new int[] { 1, 2 };
+            MatchManager.CreateMatch(playerIDs);
+            MatchManager.StartSelectingCharacters();
+
+            UIWindow_Selection.OnSelectionFinished += MatchManager.SelectionFinished;
+            UIWindow_Selection.SetSelectingPlayer(1);
         }
 
 
