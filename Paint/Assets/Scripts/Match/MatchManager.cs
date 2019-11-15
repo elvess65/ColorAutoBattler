@@ -1,16 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paint.Match
 {
     public class MatchManager 
     {
-        private MatchPlayer[] m_MatchPlayers;
+        public System.Action OnSelectingCharactersStarted;
+        public System.Action<int> OnPlayerStartSelectCharacters;
+        public System.Action OnStartMatch;
 
+        private MatchPlayer[] m_MatchPlayers;
         private int m_CurSelectingPlayerIndex = 0;
 
-        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 1;
+        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 2;
+
 
         public void CreateMatch(int[] ids)
         {
@@ -27,6 +30,8 @@ namespace Paint.Match
 
         public void StartSelectingCharacters()
         {
+            OnSelectingCharactersStarted?.Invoke();
+
             m_CurSelectingPlayerIndex = -1;
 
             AllowSelectNextPlayer();
@@ -45,7 +50,7 @@ namespace Paint.Match
         
         void StartMatch()
         {
-            Debug.Log("Start match");
+            OnStartMatch?.Invoke();
         }
 
         void AllowSelectNextPlayer()
@@ -54,7 +59,7 @@ namespace Paint.Match
             if (m_CurSelectingPlayerIndex >= m_MatchPlayers.Length)
                 m_CurSelectingPlayerIndex = 0;
 
-            Debug.Log("Player with id " + m_CurSelectingPlayerIndex + " is selecting");
+            OnPlayerStartSelectCharacters?.Invoke(m_MatchPlayers[m_CurSelectingPlayerIndex].ID);
         }
 
         bool AllPlayersFinishedSelection()

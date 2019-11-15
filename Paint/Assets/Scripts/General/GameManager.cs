@@ -47,6 +47,8 @@ namespace Paint.General
         {
             InputManager.Init();
             CameraController.Init();
+
+            UIWindow_Selection.gameObject.SetActive(false);
         }
 
         void CreatePlayer()
@@ -138,14 +140,18 @@ namespace Paint.General
 
         void CreateMatch()
         {
+            int[] playerIDs = new int[] { 1, 2 };
+
             MatchManager = new MatchManager();
 
-            int[] playerIDs = new int[] { 1, 2 };
-            MatchManager.CreateMatch(playerIDs);
-            MatchManager.StartSelectingCharacters();
+            MatchManager.OnSelectingCharactersStarted += () => UIWindow_Selection.gameObject.SetActive(true);
+            MatchManager.OnPlayerStartSelectCharacters += UIWindow_Selection.SetSelectingPlayer;
+            MatchManager.OnStartMatch += () => UIWindow_Selection.gameObject.SetActive(false);
 
             UIWindow_Selection.OnSelectionFinished += MatchManager.SelectionFinished;
-            UIWindow_Selection.SetSelectingPlayer(1);
+
+            MatchManager.CreateMatch(playerIDs);
+            MatchManager.StartSelectingCharacters();
         }
 
 
