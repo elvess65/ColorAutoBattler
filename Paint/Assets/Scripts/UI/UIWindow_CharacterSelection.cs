@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using Paint.Character.Weapon;
+using Paint.Characters;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class UIWindow_CharacterSelection : MonoBehaviour
 {
-    public System.Action<int, int, int> OnSelectionFinished;
+    public System.Action<CharacterTypes, WeaponTypes, WeaponTypes> OnSelectionFinished;
 
     public RectTransform CharactersParent;
     public RectTransform AttacksParent;
@@ -17,11 +19,9 @@ public class UIWindow_CharacterSelection : MonoBehaviour
     public Button[] AttckButtons;
     public Button[] ResistsButtons;
 
-    public enum CharacterTypes { Melee, Range, Fly }
-
-    private int m_SelectedCharacter;
-    private int m_SelectedAttack;
-    private int m_SelectedResist;
+    private CharacterTypes m_SelectedCharacter;
+    private WeaponTypes m_SelectedAttack;
+    private WeaponTypes m_SelectedResist;
 
 
     public void SetSelectingPlayer(int id)
@@ -33,7 +33,9 @@ public class UIWindow_CharacterSelection : MonoBehaviour
 
     void ToCharacterSelectionState()
     {
-        m_SelectedCharacter = m_SelectedAttack = m_SelectedResist = -1;
+        m_SelectedCharacter = CharacterTypes.Max;
+        m_SelectedAttack = WeaponTypes.Max;
+        m_SelectedResist = WeaponTypes.Max;
 
         CharactersParent.gameObject.SetActive(true);
         AttacksParent.gameObject.SetActive(false);
@@ -66,22 +68,22 @@ public class UIWindow_CharacterSelection : MonoBehaviour
 
     public void CharacterButtonPressHandler(int type)
     {
-        m_SelectedCharacter = type;
-        CharacterTypes t = (CharacterTypes)type;
-        TextCharacter.text = t.ToString();
+        m_SelectedCharacter = (CharacterTypes)type;
+        TextCharacter.text = m_SelectedCharacter.ToString();
 
         ToParamsSelectionState();
     }
 
     public void AttckButtonPressHandler(int type)
     {
-        m_SelectedAttack = type;
+        m_SelectedAttack = (WeaponTypes)type;
 
         RestoreNotSelectedButtons();
 
-        AttckButtons[type].image.color = Color.green;
-        ResistsButtons[type].image.color = GetReducedAlphaColor(ResistsButtons[type].image.color);
-        ResistsButtons[type].enabled = false;
+        int index = (int)m_SelectedAttack;
+        AttckButtons[index].image.color = Color.green;
+        ResistsButtons[index].image.color = GetReducedAlphaColor(ResistsButtons[index].image.color);
+        ResistsButtons[index].enabled = false;
 
         if (SelectionFinished())
             ToSelectionFinishedState();
@@ -89,12 +91,13 @@ public class UIWindow_CharacterSelection : MonoBehaviour
 
     public void ResistButtonPressHandler(int type)
     {
-        m_SelectedResist = type;
+        m_SelectedResist = (WeaponTypes)type;
         RestoreNotSelectedButtons();
 
-        ResistsButtons[type].image.color = Color.green;
-        AttckButtons[type].image.color = GetReducedAlphaColor(AttckButtons[type].image.color);
-        AttckButtons[type].enabled = false;
+        int index = (int)m_SelectedResist;
+        ResistsButtons[index].image.color = Color.green;
+        AttckButtons[index].image.color = GetReducedAlphaColor(AttckButtons[index].image.color);
+        AttckButtons[index].enabled = false;
 
         if (SelectionFinished())
             ToSelectionFinishedState();
@@ -106,7 +109,7 @@ public class UIWindow_CharacterSelection : MonoBehaviour
     public void SelectButtonPressHandler() => OnSelectionFinished?.Invoke(m_SelectedCharacter, m_SelectedAttack, m_SelectedResist);
 
 
-    bool SelectionFinished() => m_SelectedAttack >= 0 && m_SelectedResist >= 0;
+    bool SelectionFinished() => m_SelectedAttack != WeaponTypes.Max && m_SelectedResist != WeaponTypes.Max;
 
     void RestoreButtons()
     {
@@ -127,7 +130,7 @@ public class UIWindow_CharacterSelection : MonoBehaviour
     {
         for (int i = 0; i < AttckButtons.Length; i++)
         {
-            if (i != m_SelectedResist && i != m_SelectedAttack)
+            if (i != (int)m_SelectedResist && i != (int)m_SelectedAttack)
             {
                 AttckButtons[i].image.color = Color.white;
                 AttckButtons[i].enabled = true;
@@ -136,7 +139,7 @@ public class UIWindow_CharacterSelection : MonoBehaviour
 
         for (int i = 0; i < ResistsButtons.Length; i++)
         {
-            if (i != m_SelectedResist && i != m_SelectedAttack)
+            if (i != (int)m_SelectedResist && i != (int)m_SelectedAttack)
             {
                 ResistsButtons[i].image.color = Color.white;
                 ResistsButtons[i].enabled = true;

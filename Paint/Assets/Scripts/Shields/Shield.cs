@@ -12,16 +12,16 @@ namespace Paint.Shields
             Color color = Color.gray;
             switch (type)
             {
-                case WeaponTypes.Red:
+                case WeaponTypes.Frost:
                     color = Color.red;
                     break;
-                case WeaponTypes.Green:
+                case WeaponTypes.Sun:
                     color = Color.green;
                     break;
-                case WeaponTypes.Blue:
+                case WeaponTypes.Earth:
                     color = Color.blue;
                     break;
-                case WeaponTypes.Yellow:
+                case WeaponTypes.Water:
                     color = Color.yellow;
                     break;
             }

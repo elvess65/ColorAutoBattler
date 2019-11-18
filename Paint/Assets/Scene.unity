@@ -825,6 +825,8 @@ MonoBehaviour:
       type: 3}
     TurrentCharacterPrefab: {fileID: 6466972721202639612, guid: b315fb1a36b50dd4d86575bb77b96ca4,
       type: 3}
+    UnitCharacterPrefab: {fileID: 7171391443062588388, guid: f262a062ebd239d428a2f807b5fb4184,
+      type: 3}
     ProjectilePrefab: {fileID: 986694142156284400, guid: 7dfe24be20a78824c80ee815d54e1ec1,
       type: 3}
     ShieldPrefab: {fileID: 3950196403441561640, guid: 46cd3cdac86405e409418ac122cb41cd,

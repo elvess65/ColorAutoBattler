@@ -13,13 +13,13 @@ namespace Paint.InputSystem
                 OnShoot?.Invoke(GetDirFromScreenCenterToMouse().normalized);
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
-                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Red);
+                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Frost);
 
             if (Input.GetKeyDown(KeyCode.Alpha2))
-                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Green);
+                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Sun);
 
             if (Input.GetKeyDown(KeyCode.Alpha3))
-                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Blue);
+                OnWeaponTypeChange(Character.Weapon.WeaponTypes.Earth);
 
             if (Input.GetKeyDown(KeyCode.Space))
                 OnShieldActivate?.Invoke();

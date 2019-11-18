@@ -27,4 +27,6 @@ namespace Paint.Characters
             m_ShieldBehaviour = new Shield_None();
         }
     }
+
+    public enum CharacterTypes { Melee, Range, Fly, Max }
 }

@@ -35,9 +35,9 @@ namespace Paint.General
         void Start()
         {
             Initialize();
-            CreatePlayer();
-            CreateManeken();
-            CreateTurrent();
+            //CreatePlayer();
+            //CreateManeken();
+            //CreateTurrent();
             CreateMatch();
             //StartLoop();
         }
@@ -55,9 +55,9 @@ namespace Paint.General
         {
             (WeaponTypes type, int health)[] healthData = new (WeaponTypes type, int health)[]
             {
-                (WeaponTypes.Red, 1),
-                (WeaponTypes.Green, 2),
-                (WeaponTypes.Blue, 3),
+                (WeaponTypes.Frost, 1),
+                (WeaponTypes.Sun, 2),
+                (WeaponTypes.Earth, 3),
             };
 
             PlayerCharacter = Instantiate(AssetsLibrary.Library_Prefabs.PlayerCharacterPrefab, PlayerSpawnPoint.position, Quaternion.identity);
@@ -76,7 +76,7 @@ namespace Paint.General
 
             (WeaponTypes type, int health)[] healthData = new (WeaponTypes type, int health)[]
             {
-                (WeaponTypes.Red, 3),
+                (WeaponTypes.Frost, 3),
             };
 
             Characters.Character maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, ManekenSpawnPoints[i].position, Quaternion.identity);
@@ -86,7 +86,7 @@ namespace Paint.General
 
             healthData = new (WeaponTypes type, int health)[]
             {
-                (WeaponTypes.Green, 3),
+                (WeaponTypes.Sun, 3),
             };
 
             maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, ManekenSpawnPoints[i].position, Quaternion.identity);
@@ -96,7 +96,7 @@ namespace Paint.General
 
             healthData = new (WeaponTypes type, int health)[]
             {
-                (WeaponTypes.Blue, 3),
+                (WeaponTypes.Earth, 3),
             };
 
             maneken = Instantiate(AssetsLibrary.Library_Prefabs.ManekenCharacterPrefab, ManekenSpawnPoints[i].position, Quaternion.identity);
@@ -110,8 +110,8 @@ namespace Paint.General
 
             (WeaponTypes type, int health)[] healthData = new (WeaponTypes type, int health)[]
             {
-                (WeaponTypes.Red, 1),
-                (WeaponTypes.Green, 2),
+                (WeaponTypes.Frost, 1),
+                (WeaponTypes.Sun, 2),
             };
 
             Characters.Character turrent = Instantiate(AssetsLibrary.Library_Prefabs.TurrentCharacterPrefab, TurrentSpawnPoints[i].position, Quaternion.identity);
@@ -121,8 +121,8 @@ namespace Paint.General
 
             healthData = new (WeaponTypes type, int health)[]
             {
-                (WeaponTypes.Red, 1),
-                (WeaponTypes.Blue, 3),
+                (WeaponTypes.Frost, 1),
+                (WeaponTypes.Earth, 3),
             };
 
             turrent = Instantiate(AssetsLibrary.Library_Prefabs.TurrentCharacterPrefab, TurrentSpawnPoints[i].position, Quaternion.identity);
@@ -145,13 +145,27 @@ namespace Paint.General
             MatchManager = new MatchManager();
 
             MatchManager.OnSelectingCharactersStarted += () => UIWindow_Selection.gameObject.SetActive(true);
+            MatchManager.OnSelectionIterationFinished += SelectionIterationFinished;
             MatchManager.OnPlayerStartSelectCharacters += UIWindow_Selection.SetSelectingPlayer;
-            MatchManager.OnStartMatch += () => UIWindow_Selection.gameObject.SetActive(false);
-
+            MatchManager.OnStartMatch += StartMatch;
+            
             UIWindow_Selection.OnSelectionFinished += MatchManager.SelectionFinished;
 
             MatchManager.CreateMatch(playerIDs);
             MatchManager.StartSelectingCharacters();
+        }
+
+        void SelectionIterationFinished()
+        {
+            MatchManager.CreateCharactersByIteration();
+        }
+
+        void StartMatch()
+        {
+            UIWindow_Selection.gameObject.SetActive(false);
+            MatchManager.CreateCharactersByIteration();
+
+            Debug.Log("Start match");
         }
 
 

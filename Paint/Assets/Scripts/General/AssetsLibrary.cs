@@ -12,6 +12,8 @@ namespace Paint.General
             public Characters.Character PlayerCharacterPrefab;
             public Characters.Character ManekenCharacterPrefab;
             public Characters.Character TurrentCharacterPrefab;
+            public Characters.Character UnitCharacterPrefab;
+
             public Projectiles.Projectile ProjectilePrefab;
             public Shields.Shield ShieldPrefab;
 

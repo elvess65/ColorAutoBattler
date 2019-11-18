@@ -26,13 +26,13 @@ namespace Paint.Character.Health.UI
 
             switch (type)
             {
-                case WeaponTypes.Blue:
+                case WeaponTypes.Earth:
                     Image_FG.color = Color.blue;
                     break;
-                case WeaponTypes.Green:
+                case WeaponTypes.Sun:
                     Image_FG.color = Color.green;
                     break;
-                case WeaponTypes.Red:
+                case WeaponTypes.Frost:
                     Image_FG.color = Color.red;
                     break;
                 default:
