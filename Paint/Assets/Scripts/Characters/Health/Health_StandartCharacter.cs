@@ -32,7 +32,7 @@ namespace Paint.Character.Health
                 return emptySegments == m_HealthData.Count;
             }
         }
-
+        
 
         public Health_StandartCharacter((WeaponTypes type, int health)[] healthData, Transform healthBarSpawnPoint, Transform followTarget)
         {
@@ -55,12 +55,13 @@ namespace Paint.Character.Health
             m_UIHealthBarController.Init(followTarget, m_HealthData);
         }
 
+
         /// <summary>
         /// Нанести урон персонажу
         /// </summary>
         public void TakeDamage(WeaponTypes type, int damage)
         {
-            HealthSegment healthSegment = GetSegmentForTakeDamage(type);
+            HealthSegment healthSegment = GetUISegmentForTakeDamage(type);
             if (healthSegment != null)
             {
                 //Нанести  урон
@@ -79,11 +80,17 @@ namespace Paint.Character.Health
                 OnWrongType?.Invoke(type);
         }
 
+        /// <summary>
+        /// Получить объект, в котором создается UI сегмент
+        /// </summary>
+        /// <returns></returns>
+        public Transform GetUISegmentParent() => m_UIHealthBarController.SegmentParent;
+
 
         /// <summary>
         /// Получить сегмент хп, которому наноситься урон
         /// </summary>
-        HealthSegment GetSegmentForTakeDamage(WeaponTypes type)
+        HealthSegment GetUISegmentForTakeDamage(WeaponTypes type)
         {
             if (m_HealthData.ContainsKey(type))
                 return m_HealthData[type];
@@ -91,7 +98,7 @@ namespace Paint.Character.Health
             return null;
         }
 
-   
+
         /// <summary>
         /// Представление одного сегмента хп
         /// </summary>

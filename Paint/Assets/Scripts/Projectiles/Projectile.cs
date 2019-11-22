@@ -13,7 +13,7 @@ namespace Paint.Projectiles
 
         private Vector3 m_MoveDir;
         private float m_Speed = 5;
-        private float m_LifeTime = 1;
+        private float m_LifeTime = 3;
         private float m_CurLifeTime = 0;
 
         private bool isActive = false;

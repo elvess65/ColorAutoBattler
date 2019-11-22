@@ -18,7 +18,9 @@ namespace Paint.General
             public Shields.Shield ShieldPrefab;
 
             public Character.Health.UI.UIHealthBarController UIHealthBarPrefab;
+            public Character.Health.UI.UIHealthBarController_Unit UIHealthBarUnitPrefab;
             public Character.Health.UI.UIHealthBarSegment UIHealthBarSegmentPrefab;
+            public Character.Health.UI.UIAttackDefenceBar UIAttackDefenceBarPrefab;
         }
     }
 }

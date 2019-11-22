@@ -1,5 +1,4 @@
 ﻿using Paint.Character.Weapon;
-using Paint.Controllers3D;
 using Paint.General;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,26 +9,19 @@ namespace Paint.Character.Health.UI
     /// <summary>
     /// Контроллер объекта, который отображает количество ХП у персонажа
     /// </summary>
-    [RequireComponent(typeof(FollowTransformController))]
-    public class UIHealthBarController : MonoBehaviour
+    public class UIHealthBarController : UIFollowingObject
     {
         public RectTransform SegmentParent;
 
         private float m_InitSize = 3;
         private float m_StepDelta = 0.5f; 
 
-        private Transform m_Parent;
-		private FollowTransformController m_FollowController;
         private Dictionary<WeaponTypes, UIHealthBarSegment> m_Segments;
 
 
         public void Init(Transform parent, Dictionary<WeaponTypes, HealthSegment> healthData)
         {
-            //Follow
-            if (m_FollowController == null)
-                m_FollowController = GetComponent<FollowTransformController>();
-
-            m_FollowController.Init(parent);
+            Init(parent);
 
             //Healthbar
             int segments = 0;

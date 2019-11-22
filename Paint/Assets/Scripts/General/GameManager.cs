@@ -13,11 +13,14 @@ namespace Paint.General
         public AssetsLibrary AssetsLibrary;
         public CameraController CameraController;
         public InputManager InputManager;
+        public AutoBattleController AutoBattleController;
         public UIWindow_CharacterSelection UIWindow_Selection;
 
         public Transform PlayerSpawnPoint;
         public Transform[] ManekenSpawnPoints;
         public Transform[] TurrentSpawnPoints;
+        public Transform[] Player1SpawnPoints;
+        public Transform[] Player2SpawnPoints;
 
         public MatchManager MatchManager { get; private set; }
         public Characters.Character PlayerCharacter { get; private set; }
@@ -165,7 +168,10 @@ namespace Paint.General
             UIWindow_Selection.gameObject.SetActive(false);
             MatchManager.CreateCharactersByIteration();
 
-            Debug.Log("Start match");
+            AutoBattleController.Init(MatchManager.MatchPlayers);
+            AutoBattleController.StartBattle();
+
+            IsActive = true;
         }
 
 

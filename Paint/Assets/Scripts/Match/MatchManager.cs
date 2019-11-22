@@ -1,5 +1,6 @@
 ﻿using Paint.Character.Weapon;
 using Paint.Characters;
+using Paint.General;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,22 +13,23 @@ namespace Paint.Match
         public System.Action<int> OnPlayerStartSelectCharacters;
         public System.Action OnStartMatch;
 
-        private MatchPlayer[] m_MatchPlayers;
         private int m_CurSelectingPlayerIndex = 0;
         private int m_IterationIndex = 0;
 
-        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 2;
+        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 1;
+
+        public MatchPlayer[] MatchPlayers { get; private set; }
 
 
         public void CreateMatch(int[] ids)
         {
             Debug.Log("Create match. Total players: " + ids.Length);
 
-            m_MatchPlayers = new MatchPlayer[ids.Length];
+            MatchPlayers = new MatchPlayer[ids.Length];
             for (int i = 0; i < ids.Length; i++)
             {
                 MatchPlayer player = new MatchPlayer(ids[i], m_CONTROLLED_CHARACTERS_AMOUNT);
-                m_MatchPlayers[i] = player;
+                MatchPlayers[i] = player;
             }
         }
 
@@ -42,7 +44,7 @@ namespace Paint.Match
 
         public void SelectionFinished(CharacterTypes characterType, WeaponTypes attackType, WeaponTypes resistType)
         {
-            m_MatchPlayers[m_CurSelectingPlayerIndex].AddCharacter(characterType, attackType, resistType);
+            MatchPlayers[m_CurSelectingPlayerIndex].AddCharacter(characterType, attackType, resistType);
 
             if (AllPlayersFinishedSelection())
                 StartMatch();
@@ -52,10 +54,20 @@ namespace Paint.Match
 
         public void CreateCharactersByIteration()
         {
-            for (int i = 0; i < m_MatchPlayers.Length; i++)
+            for (int i = 0; i < MatchPlayers.Length; i++)
             {
-                MatchPlayer.CharactersData data = m_MatchPlayers[i].ControlledCharactersData[m_IterationIndex];
-                Debug.Log(data.CharacterType + " " + data.AttackType + " " + data.ResistType);
+                MatchPlayer.CharactersData data = MatchPlayers[i].ControlledCharactersData[m_IterationIndex];
+
+                Vector3 pos = Vector3.zero;
+                if (i == 0)
+                    pos = GameManager.Instance.Player1SpawnPoints[m_IterationIndex].position;
+                else
+                    pos = GameManager.Instance.Player2SpawnPoints[m_IterationIndex].position;
+
+                UnitCharacter character = GameManager.Instantiate(GameManager.Instance.AssetsLibrary.Library_Prefabs.UnitCharacterPrefab, pos, Quaternion.identity) as UnitCharacter;
+                character.Init(MatchPlayers[i].ID, 20, data.AttackType, data.ResistType);
+
+                MatchPlayers[i].ControlledCharacters.Add(character);
             }
 
             m_IterationIndex++;
@@ -70,26 +82,26 @@ namespace Paint.Match
         void AllowSelectNextPlayer()
         {
             m_CurSelectingPlayerIndex++;
-            if (m_CurSelectingPlayerIndex >= m_MatchPlayers.Length)
+            if (m_CurSelectingPlayerIndex >= MatchPlayers.Length)
             {
                 m_CurSelectingPlayerIndex = 0;
 
                 OnSelectionIterationFinished?.Invoke();
             }
 
-            OnPlayerStartSelectCharacters?.Invoke(m_MatchPlayers[m_CurSelectingPlayerIndex].ID);
+            OnPlayerStartSelectCharacters?.Invoke(MatchPlayers[m_CurSelectingPlayerIndex].ID);
         }
 
         bool AllPlayersFinishedSelection()
         {
             int playersFinishedSelectionAmount = 0;
-            for (int i = 0; i < m_MatchPlayers.Length; i++)
+            for (int i = 0; i < MatchPlayers.Length; i++)
             {
-                if (m_MatchPlayers[i].HasFullCharacters)
+                if (MatchPlayers[i].HasFullCharacters)
                     playersFinishedSelectionAmount++;
             }
 
-            return playersFinishedSelectionAmount == m_MatchPlayers.Length;
+            return playersFinishedSelectionAmount == MatchPlayers.Length;
         }
 
 
@@ -100,10 +112,10 @@ namespace Paint.Match
 
             public int ID { get; private set; }
             public List<CharactersData> ControlledCharactersData { get; private set; }
+            public List<UnitCharacter> ControlledCharacters { get; set; }
+            public bool HasFullCharacters => ControlledCharactersData.Count == m_ControlledCharactersAmount;
 
             private int m_ControlledCharactersAmount;
-
-            public bool HasFullCharacters => ControlledCharactersData.Count == m_ControlledCharactersAmount;
 
 
             public MatchPlayer(int id, int controlledCharactersAmount)
@@ -112,6 +124,7 @@ namespace Paint.Match
                 m_ControlledCharactersAmount = controlledCharactersAmount;
 
                 ControlledCharactersData = new List<CharactersData>();
+                ControlledCharacters = new List<UnitCharacter>();
             }
 
             public void AddCharacter(CharacterTypes characterType, WeaponTypes attackType, WeaponTypes resistType)

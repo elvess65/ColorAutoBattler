@@ -1,4 +1,5 @@
 ﻿using Paint.Character.Weapon;
+using UnityEngine;
 
 namespace Paint.Character.Health
 {
@@ -11,5 +12,6 @@ namespace Paint.Character.Health
         bool IsDestroyed { get; }
 
         void TakeDamage(WeaponTypes type, int damage);
+        Transform GetUISegmentParent();
     }
 }
