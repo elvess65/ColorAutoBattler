@@ -31,6 +31,11 @@ namespace Paint.Match
             {
                 MatchPlayer player = new MatchPlayer(ids[i], m_CONTROLLED_CHARACTERS_AMOUNT);
                 MatchPlayers[i] = player;
+
+                if (i != 0)
+                    player.TeamColor = new Color32(248, 155, 255, 255);
+                else
+                    player.TeamColor = new Color32(253, 255, 155, 255);
             }
         }
 
@@ -74,7 +79,7 @@ namespace Paint.Match
                 }
 
                 UnitCharacter character = GameManager.Instantiate(GetUnitPrefabByType(data.CharacterType), pos, Quaternion.identity) as UnitCharacter;
-                character.Init(MatchPlayers[i].ID, data.ID, hpAmount, data.CharacterType, data.AttackType, data.ResistType);
+                character.Init(MatchPlayers[i].ID, data.ID, hpAmount, MatchPlayers[i].TeamColor, data.CharacterType, data.AttackType, data.ResistType);
                 character.gameObject.name = "Unit. ID: " + data.ID + ". PlayerID: " + MatchPlayers[i].ID;
                 character.OnDestroy += CharacterDestroyedHandler;
 
@@ -161,6 +166,7 @@ namespace Paint.Match
         {
             public static int GLOBAL_ID = 100;
 
+            public Color TeamColor;
             public int ID { get; private set; }
             public List<CharactersData> ControlledCharactersData { get; private set; }
             public List<UnitCharacter> ControlledCharacters { get; set; }

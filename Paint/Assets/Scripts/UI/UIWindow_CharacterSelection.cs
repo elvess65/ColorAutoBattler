@@ -25,9 +25,10 @@ public class UIWindow_CharacterSelection : MonoBehaviour
 
     private Color32 m_SELECTED_COLOR = new Color32(158, 255, 170, 200);
 
-    public void SetSelectingPlayer(int id)
+    public void SetSelectingPlayer(int id, Color color)
     {
         TextPlayer.text = string.Format("Player {0}", id);
+        TextPlayer.color = color;
         ToCharacterSelectionState();
     }
 

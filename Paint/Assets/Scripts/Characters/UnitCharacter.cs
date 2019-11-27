@@ -28,8 +28,10 @@ namespace Paint.Characters
         public int ID;
         public bool HasTarget => m_Target != null;
 
-        public void Init(int playerID, int id, int healthAmount, CharacterTypes cType, WeaponTypes attackType, WeaponTypes resistType)
+        public void Init(int playerID, int id, int healthAmount, Color teamColor, CharacterTypes cType, WeaponTypes attackType, WeaponTypes resistType)
         {
+            R.material.color = teamColor;
+
             switch(cType)
             {
                 case CharacterTypes.Melee:
