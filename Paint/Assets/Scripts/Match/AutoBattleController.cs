@@ -7,10 +7,10 @@ namespace Paint.Match
     public class AutoBattleController : MonoBehaviour
     {
         private bool m_BattleIsStarted = false;
-        private MatchPlayer[] m_MatchPlayers;
+        private MatchPlayer[] m_Players;
 
 
-        public void Init(MatchPlayer[] matchPlayers) => m_MatchPlayers = matchPlayers;
+        public void Init(MatchPlayer[] matchPlayers) => m_Players = matchPlayers;
 
         public void StartBattle() => m_BattleIsStarted = true;
 
@@ -21,28 +21,62 @@ namespace Paint.Match
         {
             if (m_BattleIsStarted)
             {
-                for (int i = 0; i < m_MatchPlayers.Length; i++)
+                for (int i = 0; i < m_Players.Length; i++)
                 {
-                    for (int j = 0; j < m_MatchPlayers[i].ControlledCharacters.Count; j++)
+                    for (int j = 0; j < m_Players[i].ControlledCharacters.Count; j++)
                     {
-                        UnitCharacter currentCharacter = m_MatchPlayers[i].ControlledCharacters[j];
+                        //Текущий юнит
+                        UnitCharacter currentCharacter = m_Players[i].ControlledCharacters[j];
 
-                        for (int i1 = 0; i1 < m_MatchPlayers.Length; i1++)
+                        //Текущий юнит не уничтожен
+                        if (!currentCharacter.IsDestroyed)
                         {
-                            for (int j1 = 0; j1 < m_MatchPlayers[i1].ControlledCharacters.Count; j1++)
-                            {
-                                if (m_MatchPlayers[i].ID != m_MatchPlayers[i1].ID)
-                                {
-                                    UnitCharacter enemyCharacter = m_MatchPlayers[i1].ControlledCharacters[j1];
-
-                                    Vector3 dirToEnemy = enemyCharacter.transform.position - currentCharacter.transform.position;
-                                    currentCharacter.Shoot(new Vector2(dirToEnemy.x, dirToEnemy.z).normalized);
-                                }
-                            }
+                            //Нет цели
+                            if (!currentCharacter.HasTarget)
+                                currentCharacter.SetTarget(FindClosestCharacter(m_Players[i].ID, currentCharacter));
+                            else
+                                currentCharacter.AttackTarget();
                         }
                     }
                 }
             }
         }
+
+        UnitCharacter FindClosestCharacter(int excludedPlayerID, UnitCharacter currentCharater)
+        {
+            float distToEnemy = float.MaxValue;
+            UnitCharacter closestCharacter = null;
+
+            for (int i = 0; i < m_Players.Length; i++)
+            {
+                //Исключить определенного игрока
+                if (m_Players[i].ID != excludedPlayerID)
+                {
+                    //Пройтись по всем игрокам остальных игроков
+                    for (int j = 0; j < m_Players[i].ControlledCharacters.Count; j++)
+                    {
+                        //Юнит игрока
+                        UnitCharacter character = m_Players[i].ControlledCharacters[j];
+
+                        //Если юнит не уничтожен
+                        if (!character.IsDestroyed)
+                        {
+                            //Вектор от текущего юнита, к юниту другого игрока
+                            Vector3 dirToEnemy = character.transform.position - character.transform.position;
+
+                            //Если этот юнит ближе чем все предыдущие
+                            if (dirToEnemy.sqrMagnitude < distToEnemy)
+                            {
+                                distToEnemy = dirToEnemy.sqrMagnitude;
+                                closestCharacter = character;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return closestCharacter;
+        }
     }
+
 }

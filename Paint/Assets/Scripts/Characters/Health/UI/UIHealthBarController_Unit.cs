@@ -34,7 +34,7 @@ namespace Paint.Character.Health.UI
             m_UIAttackDefenceBar = Instantiate(GameManager.Instance.AssetsLibrary.Library_Prefabs.UIAttackDefenceBarPrefab);
             m_UIAttackDefenceBar.transform.SetParent(SegmentParent);
             m_UIAttackDefenceBar.transform.localScale = Vector3.one;
-            m_UIAttackDefenceBar.transform.localPosition = new Vector3(0, 0, -350);
+            m_UIAttackDefenceBar.transform.localPosition = new Vector3(0, 0, -200);
             m_UIAttackDefenceBar.transform.localRotation = Quaternion.Euler(new Vector3(-45, 0, 0));
 
             m_UIAttackDefenceBar.Init(attackType, resistType);

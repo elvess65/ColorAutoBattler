@@ -23,10 +23,11 @@ public class UIWindow_CharacterSelection : MonoBehaviour
     private WeaponTypes m_SelectedAttack;
     private WeaponTypes m_SelectedResist;
 
+    private Color32 m_SELECTED_COLOR = new Color32(158, 255, 170, 200);
 
     public void SetSelectingPlayer(int id)
     {
-        TextPlayer.text = string.Format("Player " + id + " is selecting");
+        TextPlayer.text = string.Format("Player {0}", id);
         ToCharacterSelectionState();
     }
 
@@ -81,7 +82,7 @@ public class UIWindow_CharacterSelection : MonoBehaviour
         RestoreNotSelectedButtons();
 
         int index = (int)m_SelectedAttack;
-        AttckButtons[index].image.color = Color.green;
+        AttckButtons[index].image.color = m_SELECTED_COLOR;
         ResistsButtons[index].image.color = GetReducedAlphaColor(ResistsButtons[index].image.color);
         ResistsButtons[index].enabled = false;
 
@@ -95,7 +96,7 @@ public class UIWindow_CharacterSelection : MonoBehaviour
         RestoreNotSelectedButtons();
 
         int index = (int)m_SelectedResist;
-        ResistsButtons[index].image.color = Color.green;
+        ResistsButtons[index].image.color = m_SELECTED_COLOR;
         AttckButtons[index].image.color = GetReducedAlphaColor(AttckButtons[index].image.color);
         AttckButtons[index].enabled = false;
 
@@ -149,7 +150,7 @@ public class UIWindow_CharacterSelection : MonoBehaviour
 
     Color GetReducedAlphaColor(Color color)
     {
-        color.a = 0.5f;
+        color.a = 0.1f;
         return color;
     }
 }

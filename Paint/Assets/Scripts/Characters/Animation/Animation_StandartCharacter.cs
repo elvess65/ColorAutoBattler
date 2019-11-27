@@ -69,7 +69,7 @@ namespace Paint.Characters.Animation
         public void PlayShieldDeactivatedAnimation() => AnimationActionsController.Sitting();
 
 
-        void SetArsenal(string name)
+        public void SetArsenal(string name)
         {
             foreach (Arsenal hand in ArsenalList)
             {

@@ -16,7 +16,7 @@ namespace Paint.Match
         private int m_CurSelectingPlayerIndex = 0;
         private int m_IterationIndex = 0;
 
-        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 1;
+        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 2;
 
         public MatchPlayer[] MatchPlayers { get; private set; }
 
@@ -64,8 +64,17 @@ namespace Paint.Match
                 else
                     pos = GameManager.Instance.Player2SpawnPoints[m_IterationIndex].position;
 
-                UnitCharacter character = GameManager.Instantiate(GameManager.Instance.AssetsLibrary.Library_Prefabs.UnitCharacterPrefab, pos, Quaternion.identity) as UnitCharacter;
-                character.Init(MatchPlayers[i].ID, 20, data.AttackType, data.ResistType);
+                int hpAmount = 20;
+                switch (data.CharacterType)
+                {
+                    case CharacterTypes.Melee:
+                        hpAmount = 30;
+                        break;
+                }
+
+                UnitCharacter character = GameManager.Instantiate(GetUnitPrefabByType(data.CharacterType), pos, Quaternion.identity) as UnitCharacter;
+                character.Init(MatchPlayers[i].ID, data.ID, hpAmount, data.CharacterType, data.AttackType, data.ResistType);
+                character.gameObject.name = "Unit. ID: " + data.ID + ". PlayerID: " + MatchPlayers[i].ID;
 
                 MatchPlayers[i].ControlledCharacters.Add(character);
             }
@@ -104,6 +113,28 @@ namespace Paint.Match
             return playersFinishedSelectionAmount == MatchPlayers.Length;
         }
 
+        UnitCharacter GetUnitPrefabByType(CharacterTypes type)
+        {
+            UnitCharacter result = null;
+
+            switch (type)
+            {
+                case CharacterTypes.Melee:
+                    result = GameManager.Instance.AssetsLibrary.Library_Prefabs.UnitCharacterMelee_Prefab as UnitCharacter;
+                    break;
+                case CharacterTypes.Range:
+                    result = GameManager.Instance.AssetsLibrary.Library_Prefabs.UnitCharacterRange_Prefab as UnitCharacter;
+                    break;
+                case CharacterTypes.Fly:
+                    result = GameManager.Instance.AssetsLibrary.Library_Prefabs.UnitCharacterFly_Prefab as UnitCharacter;
+                    break;
+                default:
+                    result = null;
+                    break;
+            }
+
+            return result;
+        }
 
 
         public class MatchPlayer

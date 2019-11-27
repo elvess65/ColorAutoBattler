@@ -35,6 +35,9 @@ namespace Paint.Character.Health
             Debug.Log("Unit is taking damage " + type + " " + damage);
 
             //Нанести  урон
+            if (m_HealthSegment.Type == type)
+                damage = damage / 2;
+
             m_HealthSegment.TakeDamage(damage);
 
             //Обновить UI

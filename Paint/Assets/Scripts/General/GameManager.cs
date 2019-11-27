@@ -148,7 +148,7 @@ namespace Paint.General
             MatchManager = new MatchManager();
 
             MatchManager.OnSelectingCharactersStarted += () => UIWindow_Selection.gameObject.SetActive(true);
-            MatchManager.OnSelectionIterationFinished += SelectionIterationFinished;
+            MatchManager.OnSelectionIterationFinished += () => MatchManager.CreateCharactersByIteration();
             MatchManager.OnPlayerStartSelectCharacters += UIWindow_Selection.SetSelectingPlayer;
             MatchManager.OnStartMatch += StartMatch;
             
@@ -156,11 +156,6 @@ namespace Paint.General
 
             MatchManager.CreateMatch(playerIDs);
             MatchManager.StartSelectingCharacters();
-        }
-
-        void SelectionIterationFinished()
-        {
-            MatchManager.CreateCharactersByIteration();
         }
 
         void StartMatch()

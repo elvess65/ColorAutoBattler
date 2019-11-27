@@ -29,16 +29,16 @@ namespace Paint.Projectiles
             switch(type)
             {
                 case WeaponTypes.Frost:
-                    color = Color.red;
-                    break;
-                case WeaponTypes.Sun:
-                    color = Color.green;
-                    break;
-                case WeaponTypes.Earth:
                     color = Color.blue;
                     break;
-                case WeaponTypes.Water:
+                case WeaponTypes.Sun:
                     color = Color.yellow;
+                    break;
+                case WeaponTypes.Earth:
+                    color = Color.green;
+                    break;
+                case WeaponTypes.Water:
+                    color = Color.cyan;
                     break;
             }
 
