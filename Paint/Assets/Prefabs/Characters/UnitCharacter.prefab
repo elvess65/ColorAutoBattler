@@ -134,6 +134,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ProjectileSpawnPoint: {fileID: 8617446968228352264}
   HealthBarSpawnPoint: {fileID: 2347802824861353046}
+  R: {fileID: 5967080777319951580}
   m_PlayerID: 0
   ID: 0
 --- !u!1 &5967080778540811012
@@ -302,6 +303,12 @@ Transform:
 --- !u!4 &5967080777331031534 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400018, guid: 398da42bc4f6f6e44852a9f96c6c4e41,
+    type: 3}
+  m_PrefabInstance: {fileID: 5967080777331419004}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &5967080777319951580 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 13700000, guid: 398da42bc4f6f6e44852a9f96c6c4e41,
     type: 3}
   m_PrefabInstance: {fileID: 5967080777331419004}
   m_PrefabAsset: {fileID: 0}

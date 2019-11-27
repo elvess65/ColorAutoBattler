@@ -11,6 +11,8 @@ namespace Paint.Characters
 {
     public class UnitCharacter : Character
     {
+        public Renderer R;
+
         private UnitCharacter m_Target;
 
         private const float m_MOVE_SPEED = 1.3f;
@@ -32,7 +34,7 @@ namespace Paint.Characters
             {
                 case CharacterTypes.Melee:
                     m_ATTACK_DISTANCE = 1;
-                    m_DAMAGE = 7;
+                    m_DAMAGE = 3;
                     break;
             }
 
@@ -88,6 +90,13 @@ namespace Paint.Characters
             Projectiles.Projectile projectile = Instantiate(GameManager.Instance.AssetsLibrary.Library_Prefabs.ProjectilePrefab);
             projectile.transform.position = ProjectileSpawnPoint.position;
             projectile.Launch(m_ShootBehaviour.WeaponType, m_ShootBehaviour.ShootDir, m_ShootBehaviour.Damage);
+        }
+
+        protected override void HandleDamageEvent_Destroy()
+        {
+            base.HandleDamageEvent_Destroy();
+
+            m_HealthBehaviour.GetUISegmentParent().gameObject.SetActive(false);
         }
     }
 

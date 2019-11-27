@@ -12,6 +12,7 @@ namespace Paint.Match
         public System.Action OnSelectingCharactersStarted;
         public System.Action<int> OnPlayerStartSelectCharacters;
         public System.Action OnStartMatch;
+        public System.Action<int> OnRoundFinished;
 
         private int m_CurSelectingPlayerIndex = 0;
         private int m_IterationIndex = 0;
@@ -75,6 +76,7 @@ namespace Paint.Match
                 UnitCharacter character = GameManager.Instantiate(GetUnitPrefabByType(data.CharacterType), pos, Quaternion.identity) as UnitCharacter;
                 character.Init(MatchPlayers[i].ID, data.ID, hpAmount, data.CharacterType, data.AttackType, data.ResistType);
                 character.gameObject.name = "Unit. ID: " + data.ID + ". PlayerID: " + MatchPlayers[i].ID;
+                character.OnDestroy += CharacterDestroyedHandler;
 
                 MatchPlayers[i].ControlledCharacters.Add(character);
             }
@@ -82,7 +84,25 @@ namespace Paint.Match
             m_IterationIndex++;
         }
 
-        
+
+        void CharacterDestroyedHandler()
+        {
+            int amountOfLostTeams = 0;
+            int winnerPlayerID = -1;
+            for (int i = 0; i < MatchPlayers.Length; i++)
+            {
+                if (MatchPlayers[i].AllCharactersDestroyed)
+                    amountOfLostTeams++;
+                else
+                    winnerPlayerID = MatchPlayers[i].ID;
+            }
+
+            if (amountOfLostTeams == MatchPlayers.Length)
+                OnRoundFinished?.Invoke(winnerPlayerID);
+            else if (amountOfLostTeams == MatchPlayers.Length - 1)
+                OnRoundFinished?.Invoke(winnerPlayerID);
+        }
+
         void StartMatch()
         {
             OnStartMatch?.Invoke();
@@ -145,6 +165,21 @@ namespace Paint.Match
             public List<CharactersData> ControlledCharactersData { get; private set; }
             public List<UnitCharacter> ControlledCharacters { get; set; }
             public bool HasFullCharacters => ControlledCharactersData.Count == m_ControlledCharactersAmount;
+            public bool AllCharactersDestroyed
+            {
+                get
+                {
+                    int destroyedCharacters = 0;
+                    foreach(UnitCharacter u in ControlledCharacters)
+                    {
+                        if (u.IsDestroyed)
+                            destroyedCharacters++;
+                    }
+
+                    return destroyedCharacters == ControlledCharacters.Count;
+                }
+            }
+
 
             private int m_ControlledCharactersAmount;
 

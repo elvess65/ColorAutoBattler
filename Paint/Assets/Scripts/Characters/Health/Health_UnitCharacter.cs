@@ -32,8 +32,6 @@ namespace Paint.Character.Health
 
         public void TakeDamage(WeaponTypes type, int damage)
         {
-            Debug.Log("Unit is taking damage " + type + " " + damage);
-
             //Нанести  урон
             if (m_HealthSegment.Type == type)
                 damage = damage / 2;

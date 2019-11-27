@@ -3,6 +3,8 @@ using Paint.Character.Weapon;
 using Paint.InputSystem;
 using Paint.Match;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Paint.General
 {
@@ -21,6 +23,9 @@ namespace Paint.General
         public Transform[] TurrentSpawnPoints;
         public Transform[] Player1SpawnPoints;
         public Transform[] Player2SpawnPoints;
+        public Transform RoundResultUI;
+        public Text Text_RoundResult;
+        public Button Button_Replay;
 
         public MatchManager MatchManager { get; private set; }
         public Characters.Character PlayerCharacter { get; private set; }
@@ -52,6 +57,8 @@ namespace Paint.General
             CameraController.Init();
 
             UIWindow_Selection.gameObject.SetActive(false);
+            RoundResultUI.gameObject.SetActive(false);
+            Button_Replay.onClick.AddListener(() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex));
         }
 
         void CreatePlayer()
@@ -151,7 +158,8 @@ namespace Paint.General
             MatchManager.OnSelectionIterationFinished += () => MatchManager.CreateCharactersByIteration();
             MatchManager.OnPlayerStartSelectCharacters += UIWindow_Selection.SetSelectingPlayer;
             MatchManager.OnStartMatch += StartMatch;
-            
+            MatchManager.OnRoundFinished += FinishRound;
+
             UIWindow_Selection.OnSelectionFinished += MatchManager.SelectionFinished;
 
             MatchManager.CreateMatch(playerIDs);
@@ -169,6 +177,11 @@ namespace Paint.General
             IsActive = true;
         }
 
+        void FinishRound(int winnerPlayerID)
+        {
+            Text_RoundResult.text = winnerPlayerID >= 0 ? string.Format("Player {0} wins", winnerPlayerID) : "Draw";
+            RoundResultUI.gameObject.SetActive(true);
+        }
 
         void HandleCameraFinishedAligning()
         {
