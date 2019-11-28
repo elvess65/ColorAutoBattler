@@ -177,9 +177,11 @@ namespace Paint.General
             IsActive = true;
         }
 
-        void FinishRound(int winnerPlayerID)
+        void FinishRound(int winnerPlayerID, Color color)
         {
             Text_RoundResult.text = winnerPlayerID >= 0 ? string.Format("Player {0} wins", winnerPlayerID) : "Draw";
+            Text_RoundResult.color = winnerPlayerID >= 0 ? color : Color.white;
+
             RoundResultUI.gameObject.SetActive(true);
         }
 

@@ -10,9 +10,9 @@ namespace Paint.Match
     {
         public System.Action OnSelectionIterationFinished;
         public System.Action OnSelectingCharactersStarted;
-        public System.Action<int> OnPlayerStartSelectCharacters;
+        public System.Action<int, Color> OnPlayerStartSelectCharacters;
         public System.Action OnStartMatch;
-        public System.Action<int> OnRoundFinished;
+        public System.Action<int, Color> OnRoundFinished;
 
         private int m_CurSelectingPlayerIndex = 0;
         private int m_IterationIndex = 0;
@@ -94,18 +94,22 @@ namespace Paint.Match
         {
             int amountOfLostTeams = 0;
             int winnerPlayerID = -1;
+            Color winnerColor = Color.white;
             for (int i = 0; i < MatchPlayers.Length; i++)
             {
                 if (MatchPlayers[i].AllCharactersDestroyed)
                     amountOfLostTeams++;
                 else
+                {
                     winnerPlayerID = MatchPlayers[i].ID;
+                    winnerColor = MatchPlayers[i].TeamColor;
+                }
             }
 
             if (amountOfLostTeams == MatchPlayers.Length)
-                OnRoundFinished?.Invoke(winnerPlayerID);
+                OnRoundFinished?.Invoke(winnerPlayerID, winnerColor);
             else if (amountOfLostTeams == MatchPlayers.Length - 1)
-                OnRoundFinished?.Invoke(winnerPlayerID);
+                OnRoundFinished?.Invoke(winnerPlayerID, winnerColor);
         }
 
         void StartMatch()
@@ -123,7 +127,7 @@ namespace Paint.Match
                 OnSelectionIterationFinished?.Invoke();
             }
 
-            OnPlayerStartSelectCharacters?.Invoke(MatchPlayers[m_CurSelectingPlayerIndex].ID);
+            OnPlayerStartSelectCharacters?.Invoke(MatchPlayers[m_CurSelectingPlayerIndex].ID, MatchPlayers[m_CurSelectingPlayerIndex].TeamColor);
         }
 
         bool AllPlayersFinishedSelection()
