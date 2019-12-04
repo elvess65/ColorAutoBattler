@@ -17,7 +17,20 @@ namespace Paint.Match
         private int m_CurSelectingPlayerIndex = 0;
         private int m_IterationIndex = 0;
 
-        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 2;
+        public const int MELEE_HP = 55;
+        public const int MELEE_DAMAGE = 7;
+
+        public const int RANGE_HP = 34;
+        public const int RANGE_DAMAGE = 9;
+
+        public const int FLY_HP = 10;
+        public const int FLY_DAMAGE = 7;
+
+        public const int DECREASE_PERCENT = 25;
+
+
+
+        private const int m_CONTROLLED_CHARACTERS_AMOUNT = 3;
 
         public MatchPlayer[] MatchPlayers { get; private set; }
 
@@ -71,15 +84,25 @@ namespace Paint.Match
                     pos = GameManager.Instance.Player2SpawnPoints[m_IterationIndex].position;
 
                 int hpAmount = 20;
+                int damage = 5;
                 switch (data.CharacterType)
                 {
                     case CharacterTypes.Melee:
-                        hpAmount = 30;
+                        hpAmount = MELEE_HP;
+                        damage = MELEE_DAMAGE;
+                        break;
+                    case CharacterTypes.Range:
+                        hpAmount = RANGE_HP;
+                        damage = RANGE_DAMAGE;
+                        break;
+                    case CharacterTypes.Fly:
+                        hpAmount = FLY_HP;
+                        damage = FLY_DAMAGE;
                         break;
                 }
 
-                UnitCharacter character = GameManager.Instantiate(GetUnitPrefabByType(data.CharacterType), pos, Quaternion.identity) as UnitCharacter;
-                character.Init(MatchPlayers[i].ID, data.ID, hpAmount, MatchPlayers[i].TeamColor, data.CharacterType, data.AttackType, data.ResistType);
+                UnitCharacter character = GameManager.Instantiate(GetUnitPrefabByType(data.CharacterType), pos, Quaternion.Euler(new Vector3(0, 180, 0))) as UnitCharacter;
+                character.Init(MatchPlayers[i].ID, data.ID, hpAmount, damage, MatchPlayers[i].TeamColor, data.CharacterType, data.AttackType, data.ResistType);
                 character.gameObject.name = "Unit. ID: " + data.ID + ". PlayerID: " + MatchPlayers[i].ID;
                 character.OnDestroy += CharacterDestroyedHandler;
 

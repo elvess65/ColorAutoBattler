@@ -1,5 +1,6 @@
 ﻿using Paint.Character.Weapon;
 using Paint.Characters;
+using Paint.Match;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,6 +20,13 @@ public class UIWindow_CharacterSelection : MonoBehaviour
     public Button[] AttckButtons;
     public Button[] ResistsButtons;
 
+    public Text Melee_Attack;
+    public Text Melee_HP;
+    public Text Range_Attack;
+    public Text Range_HP;
+    public Text Fly_Attack;
+    public Text Fly_HP;
+
     private CharacterTypes m_SelectedCharacter;
     private WeaponTypes m_SelectedAttack;
     private WeaponTypes m_SelectedResist;
@@ -27,6 +35,13 @@ public class UIWindow_CharacterSelection : MonoBehaviour
 
     public void SetSelectingPlayer(int id, Color color)
     {
+        Melee_Attack.text = $"{MatchManager.MELEE_DAMAGE}";
+        Melee_HP.text = $"{MatchManager.MELEE_HP}";
+        Range_Attack.text = $"{MatchManager.RANGE_DAMAGE}";
+        Range_HP.text = $"{MatchManager.RANGE_HP}";
+        Fly_Attack.text = $"{MatchManager.FLY_DAMAGE}";
+        Fly_HP.text = $"{MatchManager.FLY_HP}";
+
         TextPlayer.text = string.Format("Player {0}", id);
         TextPlayer.color = color;
         ToCharacterSelectionState();

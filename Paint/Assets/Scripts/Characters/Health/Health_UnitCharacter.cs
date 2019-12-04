@@ -2,6 +2,7 @@
 using Paint.Character.Health.UI;
 using Paint.Character.Weapon;
 using Paint.General;
+using Paint.Match;
 using UnityEngine;
 
 namespace Paint.Character.Health
@@ -34,7 +35,7 @@ namespace Paint.Character.Health
         {
             //Нанести  урон
             if (m_HealthSegment.Type == type)
-                damage = damage / 2;
+                damage -= damage * MatchManager.DECREASE_PERCENT / 100;
 
             m_HealthSegment.TakeDamage(damage);
 
