@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Paint.Grid.Interaction;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paint.Grid
@@ -12,8 +13,10 @@ namespace Paint.Grid
         private Vector3 m_Offset;
         private GridCell[,] m_Grid;
 
+        private List<GridCell> m_NormalCells;
 
-        public GridController(int widthInCells, int heightInCells, float cellSize, Vector2 _offset)
+
+        public GridController(int widthInCells, int heightInCells, float cellSize, Vector2 _offset, int percentOfLowObstacles, int mercentOfHighObstacles)
         {
             GridWidth = widthInCells;
             GridHeight = heightInCells;
@@ -21,14 +24,36 @@ namespace Paint.Grid
             m_Offset = new Vector3(_offset.x, 0, _offset.y);
 
             m_Grid = new GridCell[GridWidth, GridHeight];
+            m_NormalCells = new List<GridCell>();
 
             for (int i = 0; i < GridWidth; i++)
             {
                 for (int j = 0; j < GridHeight; j++)
                 {
-                    GridCell gridCell = new GridCell(i, j, m_CellSize);
+                    GridCell gridCell = new GridCell(i, j, m_CellSize, GridCell.CellTypes.Normal);
                     m_Grid[i, j] = gridCell;
+                    m_NormalCells.Add(gridCell);
                 }
+            }
+
+            int amountOfLowObstacles = m_NormalCells.Count * percentOfLowObstacles / 100;
+            int amountOfHighObstacles = m_NormalCells.Count * mercentOfHighObstacles / 100;
+
+            while (amountOfLowObstacles > 0)
+            {
+                int randomIndex = Random.Range(0, m_NormalCells.Count);
+                m_NormalCells[randomIndex].SetCellType(GridCell.CellTypes.LowObstacle);
+                m_NormalCells.RemoveAt(randomIndex);
+                amountOfLowObstacles--;
+ 
+            }
+
+            while (amountOfHighObstacles > 0)
+            {
+                int randomIndex = Random.Range(0, m_NormalCells.Count);
+                m_NormalCells[randomIndex].SetCellType(GridCell.CellTypes.HighObstacle);
+                m_NormalCells.RemoveAt(randomIndex);
+                amountOfHighObstacles--;
             }
         }
 
@@ -47,7 +72,7 @@ namespace Paint.Grid
         /// <summary>
         /// Получить расположение ячейки по координатам сетки
         /// </summary>
-        public Vector3 GetCellWorldPositionByCoord(int x, int y)
+        public Vector3 GetCellWorldPosByCoord(int x, int y)
         {
             Vector3 pos = new Vector3(x, 0, y) * m_CellSize + m_Offset;
             pos.x += m_CellSize / 2;
@@ -116,16 +141,36 @@ namespace Paint.Grid
 
     public class GridCell
     {
+        public enum CellTypes { Normal, LowObstacle, HighObstacle }
+
         public int X { get; private set; }
         public int Y { get; private set; }
         public float CellSize { get; private set; }
+        public CellTypes CellType { get; private set; }
+        public bool HasObject => m_Object != null;
 
-        public GridCell(int xCoord, int yCoord, float cellSize)
+        private iInteractableObject m_Object = null;
+
+
+        public GridCell(int xCoord, int yCoord, float cellSize, CellTypes type)
         {
             X = xCoord;
             Y = yCoord;
             CellSize = cellSize;
+
+            SetCellType(type);
         }
+
+
+        public void AddObject(iInteractableObject obj) => m_Object = obj;
+
+        public iInteractableObject GetObject() => m_Object;
+
+        public void RemoveObject() => m_Object = null;
+
+
+        public void SetCellType(CellTypes type) => CellType = type;
+
 
         public override string ToString() => string.Format("(x: {0}. y: {1}", X, Y);
     }
