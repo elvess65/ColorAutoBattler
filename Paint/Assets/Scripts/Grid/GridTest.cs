@@ -83,6 +83,20 @@ namespace Paint.Grid
                     }
                 }
             }
+
+            if (Input.GetMouseButtonDown(2))
+            {
+                if (m_SelectedObject != null && RaycastInGrid(out (int x, int y) coord))
+                {
+                    GridCell cell = m_Grid.GetCell(coord.x, coord.y);
+
+                    if (!cell.HasObject && cell.CellType == GridCell.CellTypes.Normal)
+                    {
+                        TestInteractableObject obj = m_SelectedObject as TestInteractableObject;
+                        obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(cell.X, cell.Y));
+                    }
+                }
+            }
         }
 
         bool RaycastInGrid(out (int x, int y) coord)

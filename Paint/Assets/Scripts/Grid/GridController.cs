@@ -172,6 +172,6 @@ namespace Paint.Grid
         public void SetCellType(CellTypes type) => CellType = type;
 
 
-        public override string ToString() => string.Format("(x: {0}. y: {1}", X, Y);
+        public override string ToString() => $"(x: {X}. y: {Y})";
     }
 }

@@ -18,18 +18,21 @@ namespace Paint.Grid
         {
             Vector3 pos = m_Grid.GetCellWorldPosByCoord(cell.X, cell.Y);
 
+            Color color = Color.white;
             switch (cell.CellType)
             {
                 case GridCell.CellTypes.Normal:
-                    Gizmos.color = Color.white;
+                    color = Color.white;
                     break;
                 case GridCell.CellTypes.LowObstacle:
-                    Gizmos.color = Color.blue;
+                    color = Color.blue;
                     break;
                 case GridCell.CellTypes.HighObstacle:
-                    Gizmos.color = Color.red;
+                    color = Color.red;
                     break;
             }
+
+            Gizmos.color = cell.HasObject ? Color.green : color; 
 
             Gizmos.DrawWireSphere(pos, cell.CellSize / 2);
         }
