@@ -1,4 +1,6 @@
 ﻿using Paint.Grid.Interaction;
+using Paint.Grid.Movement;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paint.Grid
@@ -7,6 +9,8 @@ namespace Paint.Grid
     {
         public GridGizmoDrawer GridGizmoDrawer;
         public LayerMask GroundLayer;
+
+        private List<GameObject> m_PathVisualization = new List<GameObject>();
 
         private GridController m_Grid;
         private iInteractableObject m_SelectedObject;
@@ -20,13 +24,13 @@ namespace Paint.Grid
             GridGizmoDrawer.SetGrid(m_Grid);
         }
 
-        private void Update()
+        void Update()
         {
             if (Input.GetMouseButtonDown(0))
             {
                 if (RaycastInGrid(out (int x, int y) coord))
                 {
-                    GridCell cell = m_Grid.GetCell(coord.x, coord.y);
+                    GridCell cell = m_Grid.GetCellByCoord(coord.x, coord.y);
                     if (cell.CellType == GridCell.CellTypes.Normal)
                     {
 
@@ -41,11 +45,15 @@ namespace Paint.Grid
                             Vector3 cellPos = m_Grid.GetCellWorldPosByCoord(coord.x, coord.y);
 
                             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
                             TestInteractableObject obj = cube.AddComponent<TestInteractableObject>();
                             cube.transform.position = cellPos;
                             cube.transform.localScale *= 0.5f;
 
                             cell.AddObject(obj);
+
+                            obj.OnUpdatePosition += UpdatePosition;
+                            obj.DistanceToUpdate = cell.CellSize;
                         }
                         else
                         {
@@ -67,7 +75,7 @@ namespace Paint.Grid
             {
                 if (RaycastInGrid(out (int x, int y) coord))
                 {
-                    GridCell cell = m_Grid.GetCell(coord.x, coord.y);
+                    GridCell cell = m_Grid.GetCellByCoord(coord.x, coord.y);
                     if (cell.HasObject)
                     {
                         if (m_SelectedObject != null && m_SelectedObject.IsSelected)
@@ -88,13 +96,54 @@ namespace Paint.Grid
             {
                 if (m_SelectedObject != null && RaycastInGrid(out (int x, int y) coord))
                 {
-                    GridCell cell = m_Grid.GetCell(coord.x, coord.y);
+                    GridCell cell = m_Grid.GetCellByCoord(coord.x, coord.y);
 
                     if (!cell.HasObject && cell.CellType == GridCell.CellTypes.Normal)
                     {
                         TestInteractableObject obj = m_SelectedObject as TestInteractableObject;
                         obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(cell.X, cell.Y));
+
+                        List<GridCell> path = m_Grid.FindPath(m_Grid.GetCellByWorldPos(obj.transform.position), cell);
+                        if (path != null)
+                        {
+                            if (m_PathVisualization.Count > 0)
+                            {
+                                for (int i = 0; i < m_PathVisualization.Count; i++)
+                                    Destroy(m_PathVisualization[i]);
+
+                                m_PathVisualization.Clear();
+                            }
+
+                            for (int i = 0; i < path.Count; i++)
+                            {
+                                GameObject p = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                                p.transform.position = m_Grid.GetCellWorldPosByCoord(path[i].X, path[i].Y);
+                                p.transform.localScale *= 0.2f;
+                                p.GetComponent<Renderer>().material.color = Color.red;
+
+                                m_PathVisualization.Add(p);
+                            }
+                        }
                     }
+                }
+            }
+        }
+
+
+        void UpdatePosition(Vector3 prevPos, Vector3 curPos, iMovableObject sender)
+        {
+            GridCell fromCell = m_Grid.GetCellByWorldPos(prevPos);
+            GridCell toCell = m_Grid.GetCellByWorldPos(curPos);
+
+            if (!fromCell.HasEqualCoord(toCell))
+            {
+                fromCell.RemoveObject();
+                toCell.AddObject(sender);
+
+                if (m_PathVisualization != null)
+                {
+                    Destroy(m_PathVisualization[0]);
+                    m_PathVisualization.RemoveAt(0);
                 }
             }
         }

@@ -12,6 +12,7 @@ namespace Paint.Grid
         private float m_CellSize;
         private Vector3 m_Offset;
         private GridCell[,] m_Grid;
+        private GridPathFindController m_GridPathFindController;
 
         private List<GridCell> m_NormalCells;
 
@@ -25,6 +26,7 @@ namespace Paint.Grid
 
             m_Grid = new GridCell[GridWidth, GridHeight];
             m_NormalCells = new List<GridCell>();
+            m_GridPathFindController = new GridPathFindController(this);
 
             for (int i = 0; i < GridWidth; i++)
             {
@@ -43,6 +45,8 @@ namespace Paint.Grid
             {
                 int randomIndex = Random.Range(0, m_NormalCells.Count);
                 m_NormalCells[randomIndex].SetCellType(GridCell.CellTypes.LowObstacle);
+                CreateDummyObstacle(PrimitiveType.Sphere, GetCellWorldPosByCoord(m_NormalCells[randomIndex].X, m_NormalCells[randomIndex].Y));
+
                 m_NormalCells.RemoveAt(randomIndex);
                 amountOfLowObstacles--;
  
@@ -52,22 +56,36 @@ namespace Paint.Grid
             {
                 int randomIndex = Random.Range(0, m_NormalCells.Count);
                 m_NormalCells[randomIndex].SetCellType(GridCell.CellTypes.HighObstacle);
+                CreateDummyObstacle(PrimitiveType.Cylinder, GetCellWorldPosByCoord(m_NormalCells[randomIndex].X, m_NormalCells[randomIndex].Y));
+
                 m_NormalCells.RemoveAt(randomIndex);
                 amountOfHighObstacles--;
             }
         }
 
+        public List<GridCell> FindPath(GridCell startNode, GridCell targetNode) => m_GridPathFindController.FindPath(startNode, targetNode);
+
 
         /// <summary>
         /// Получить ячейку по координатам сетки
         /// </summary>
-        public GridCell GetCell(int x, int y)
+        public GridCell GetCellByCoord(int x, int y)
         {
             if (CoordIsOnGrid(x, y))
                 return m_Grid[x, y];
 
             return null;
         }
+
+        /// <summary>
+        /// Получить ячейку по расположению
+        /// </summary>
+        public GridCell GetCellByWorldPos(Vector3 pos)
+        {
+            (int x, int y) coord = GetCellCoordByWorldPos(pos);
+            return GetCellByCoord(coord.x, coord.y);
+        }
+
 
         /// <summary>
         /// Получить расположение ячейки по координатам сетки
@@ -137,7 +155,16 @@ namespace Paint.Grid
         /// Находится ли указанная координата в пределах сетки
         /// </summary>
         public bool CoordIsOnGrid(int x, int y) => (x >= 0 && x < GridWidth) && (y >= 0 && y < GridHeight);
+
+
+        void CreateDummyObstacle(PrimitiveType type, Vector3 pos)
+        {
+            GameObject cube = GameObject.CreatePrimitive(type);
+            cube.transform.position = pos;
+            cube.transform.localScale *= 0.5f;
+        }
     }
+
 
     public class GridCell
     {
@@ -148,6 +175,12 @@ namespace Paint.Grid
         public float CellSize { get; private set; }
         public CellTypes CellType { get; private set; }
         public bool HasObject => m_Object != null;
+    
+        public int GCost;
+        public int HCost;
+        public int FCost { get { return GCost + HCost; } }
+        public Vector2Int CoordAsVec2Int => new Vector2Int(X, Y);
+        public GridCell ParentNode;
 
         private iInteractableObject m_Object = null;
 
@@ -170,6 +203,8 @@ namespace Paint.Grid
 
 
         public void SetCellType(CellTypes type) => CellType = type;
+
+        public bool HasEqualCoord(GridCell otherCell) => X == otherCell.X && Y == otherCell.Y;
 
 
         public override string ToString() => $"(x: {X}. y: {Y})";

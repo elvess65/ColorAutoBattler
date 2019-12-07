@@ -1,16 +1,14 @@
-﻿using UnityEngine;
+﻿using System;
+using Paint.Grid.Movement;
+using UnityEngine;
 
 namespace Paint.Grid.Interaction
 {
-    public class TestInteractableObject : MonoBehaviour, iInteractableObject
+    public class TestInteractableObject : MonoBehaviour, iMovableObject
     {
+        //iInteractable
         private bool m_IsSelected = false;
-        private bool m_IsMoving = false;
-        private Vector3 m_MovePos;
-        private Vector3 m_StartMovePos;
-
         public bool IsSelected => m_IsSelected;
-
 
         public void Select()
         {
@@ -34,10 +32,23 @@ namespace Paint.Grid.Interaction
             Debug.Log("Unselect " + gameObject.name);
         }
 
+
+        //iMovableObject
+        public event Action<Vector3, Vector3, iMovableObject> OnUpdatePosition;
+
+        private bool m_IsMoving = false;
+        private float m_CurDistToUpdate;
+        private Vector3 m_TargetPos;
+        private Vector3 m_AnchorPos;
+
+        public float DistanceToUpdate { get; set; }
+
         public void SetMovePosition(Vector3 movePos)
         {
-            m_StartMovePos = transform.position;
-            m_MovePos = movePos;
+            m_AnchorPos = transform.position;
+            m_TargetPos = movePos;
+
+            m_CurDistToUpdate = DistanceToUpdate * 0.6f;
             m_IsMoving = true;
         }
 
@@ -46,13 +57,26 @@ namespace Paint.Grid.Interaction
         {
             if (m_IsMoving)
             {
-                float sqrDistTravelled = (transform.position - m_StartMovePos).sqrMagnitude;
-                Debug.Log(sqrDistTravelled);
+                //Весь путь
+                float distToTarget = (m_TargetPos - transform.position).magnitude;
+                if (distToTarget <= 0.001f)
+                {
+                    m_IsMoving = false;
+                    OnUpdatePosition?.Invoke(m_AnchorPos, transform.position, this);
+                    return;
+                }
 
-                if (sqrDistTravelled / 2 >= 0.5f)
-                    Debug.Break();
+                //Обновление позиции ячейки
+                float distTravelled = (transform.position - m_AnchorPos).magnitude;
+                if (distTravelled >= m_CurDistToUpdate)
+                {
+                    OnUpdatePosition?.Invoke(m_AnchorPos, transform.position, this);
 
-                transform.position = Vector3.MoveTowards(transform.position, m_MovePos, Time.deltaTime * 2);
+                    m_CurDistToUpdate = DistanceToUpdate;
+                    m_AnchorPos = transform.position;
+                }
+
+                transform.position = Vector3.MoveTowards(transform.position, m_TargetPos, Time.deltaTime);
             }
         }
     }
