@@ -17,8 +17,21 @@ namespace Paint.Grid.Movement
     public interface iMovableObject : iInteractableObject
     {
         event System.Action<Vector3, Vector3, iMovableObject> OnUpdatePosition;
-        float DistanceToUpdate { get; set; }
 
-        void SetMovePosition(Vector3 movePos);
+        void SetMovePosition(Vector3 movePos, GridController gridController, float d);
+    }
+}
+
+namespace Paint.Movement
+{
+    public interface iMoveStrategy
+    {
+        event System.Action OnUpdatePosition;
+        float DistanceToUpdate { get; set; }
+        bool IsMoving { get; }
+
+        void MoveToPosition(Vector3 pos);
+        void StopMove();
+        void Update(float deltaTime);
     }
 }

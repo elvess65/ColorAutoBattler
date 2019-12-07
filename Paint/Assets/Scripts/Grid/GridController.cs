@@ -44,22 +44,26 @@ namespace Paint.Grid
             while (amountOfLowObstacles > 0)
             {
                 int randomIndex = Random.Range(0, m_NormalCells.Count);
-                m_NormalCells[randomIndex].SetCellType(GridCell.CellTypes.LowObstacle);
-                CreateDummyObstacle(PrimitiveType.Sphere, GetCellWorldPosByCoord(m_NormalCells[randomIndex].X, m_NormalCells[randomIndex].Y));
 
+                GridCell cell = m_NormalCells[randomIndex];
                 m_NormalCells.RemoveAt(randomIndex);
                 amountOfLowObstacles--;
- 
+
+                cell.SetCellType(GridCell.CellTypes.LowObstacle);
+                CreateDummyObstacle(PrimitiveType.Sphere, GetCellWorldPosByCoord(cell.X, cell.Y));
+
             }
 
             while (amountOfHighObstacles > 0)
             {
                 int randomIndex = Random.Range(0, m_NormalCells.Count);
-                m_NormalCells[randomIndex].SetCellType(GridCell.CellTypes.HighObstacle);
-                CreateDummyObstacle(PrimitiveType.Cylinder, GetCellWorldPosByCoord(m_NormalCells[randomIndex].X, m_NormalCells[randomIndex].Y));
 
+                GridCell cell = m_NormalCells[randomIndex];
                 m_NormalCells.RemoveAt(randomIndex);
                 amountOfHighObstacles--;
+
+                cell.SetCellType(GridCell.CellTypes.HighObstacle);
+                CreateDummyObstacle(PrimitiveType.Cylinder, GetCellWorldPosByCoord(cell.X, cell.Y));
             }
         }
 
@@ -106,9 +110,9 @@ namespace Paint.Grid
 
 
         /// <summary>
-        /// Список координат соседей для указанной координаты
+        /// Список координат 4 соседей для указанной координаты
         /// </summary>
-        public (int x, int y)[] GetCellNeighboursCoord(int x, int y)
+        public (int x, int y)[] GetCell4NeighboursCoord(int x, int y)
         {
             //Если координата, для которой нужно получить список соседей не находится в пределах сетки - вернуть пустой список
             if (!CoordIsOnGrid(x, y))
@@ -169,13 +173,17 @@ namespace Paint.Grid
     public class GridCell
     {
         public enum CellTypes { Normal, LowObstacle, HighObstacle }
-
+        
+        //Base
         public int X { get; private set; }
         public int Y { get; private set; }
         public float CellSize { get; private set; }
         public CellTypes CellType { get; private set; }
+
+        //Object
         public bool HasObject => m_Object != null;
-    
+
+        //Pathfinding
         public int GCost;
         public int HCost;
         public int FCost { get { return GCost + HCost; } }
@@ -204,7 +212,7 @@ namespace Paint.Grid
 
         public void SetCellType(CellTypes type) => CellType = type;
 
-        public bool HasEqualCoord(GridCell otherCell) => X == otherCell.X && Y == otherCell.Y;
+        public bool IsEqualCoord(GridCell otherCell) => X == otherCell.X && Y == otherCell.Y;
 
 
         public override string ToString() => $"(x: {X}. y: {Y})";

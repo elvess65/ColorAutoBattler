@@ -1,5 +1,6 @@
 ﻿using Paint.Grid.Interaction;
 using Paint.Grid.Movement;
+using PathCreation;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +10,6 @@ namespace Paint.Grid
     {
         public GridGizmoDrawer GridGizmoDrawer;
         public LayerMask GroundLayer;
-
-        private List<GameObject> m_PathVisualization = new List<GameObject>();
 
         private GridController m_Grid;
         private iInteractableObject m_SelectedObject;
@@ -53,7 +52,6 @@ namespace Paint.Grid
                             cell.AddObject(obj);
 
                             obj.OnUpdatePosition += UpdatePosition;
-                            obj.DistanceToUpdate = cell.CellSize;
                         }
                         else
                         {
@@ -101,29 +99,7 @@ namespace Paint.Grid
                     if (!cell.HasObject && cell.CellType == GridCell.CellTypes.Normal)
                     {
                         TestInteractableObject obj = m_SelectedObject as TestInteractableObject;
-                        obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(cell.X, cell.Y));
-
-                        List<GridCell> path = m_Grid.FindPath(m_Grid.GetCellByWorldPos(obj.transform.position), cell);
-                        if (path != null)
-                        {
-                            if (m_PathVisualization.Count > 0)
-                            {
-                                for (int i = 0; i < m_PathVisualization.Count; i++)
-                                    Destroy(m_PathVisualization[i]);
-
-                                m_PathVisualization.Clear();
-                            }
-
-                            for (int i = 0; i < path.Count; i++)
-                            {
-                                GameObject p = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                                p.transform.position = m_Grid.GetCellWorldPosByCoord(path[i].X, path[i].Y);
-                                p.transform.localScale *= 0.2f;
-                                p.GetComponent<Renderer>().material.color = Color.red;
-
-                                m_PathVisualization.Add(p);
-                            }
-                        }
+                        obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(coord.x, coord.y), m_Grid, cell.CellSize);
                     }
                 }
             }
@@ -135,16 +111,10 @@ namespace Paint.Grid
             GridCell fromCell = m_Grid.GetCellByWorldPos(prevPos);
             GridCell toCell = m_Grid.GetCellByWorldPos(curPos);
 
-            if (!fromCell.HasEqualCoord(toCell))
+            if (!fromCell.IsEqualCoord(toCell))
             {
                 fromCell.RemoveObject();
                 toCell.AddObject(sender);
-
-                if (m_PathVisualization != null)
-                {
-                    Destroy(m_PathVisualization[0]);
-                    m_PathVisualization.RemoveAt(0);
-                }
             }
         }
 

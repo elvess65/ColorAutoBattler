@@ -7,11 +7,9 @@ namespace Paint.Grid
     {
         private GridController m_GridController;
 
-        public GridPathFindController(GridController gridController) => m_GridController = gridController;
 
-        /// <summary>
-        /// Поиск пути
-        /// </summary>
+        public GridPathFindController(GridController gridController) => m_GridController = gridController;
+    
         public List<GridCell> FindPath(GridCell startNode, GridCell targetNode)
         {
             //Create open and close sets
@@ -41,22 +39,22 @@ namespace Paint.Grid
                     return RetracePath(startNode, targetNode);
 
                 //Get neighbours
-                (int x, int y)[] neighbours = m_GridController.GetCellNeighboursCoord(curNode.X, curNode.Y);
+                (int x, int y)[] neighbours = m_GridController.GetCell4NeighboursCoord(curNode.X, curNode.Y);
                 for (int i = 0; i < neighbours.Length; i++)
                 {
                     GridCell neighbourNode = m_GridController.GetCellByCoord(neighbours[i].x, neighbours[i].y);
 
-                    bool cellTypeIsIgnorable = neighbourNode.CellType != GridCell.CellTypes.Normal;
+                    bool cellTypeIsIgnorable = CellIsNotWalkable(neighbourNode);
 
                     //if neighbour is not walkable or is in closed set - skip
                     if (cellTypeIsIgnorable || closedSet.Contains(neighbourNode))
                         continue;
 
-                    int newGCostToNeighbour = curNode.GCost + GetDistanceForPathFinding(curNode, neighbourNode);
+                    int newGCostToNeighbour = curNode.GCost + GetDistanceBetweenCells(curNode, neighbourNode);
                     if (newGCostToNeighbour < neighbourNode.GCost || !openSet.Contains(neighbourNode))
                     {
                         neighbourNode.GCost = newGCostToNeighbour;
-                        neighbourNode.HCost = GetDistanceForPathFinding(neighbourNode, targetNode);
+                        neighbourNode.HCost = GetDistanceBetweenCells(neighbourNode, targetNode);
 
                         neighbourNode.ParentNode = curNode;
 
@@ -87,7 +85,7 @@ namespace Paint.Grid
             return path;
         }
 
-        int GetDistanceForPathFinding(GridCell a, GridCell b)
+        int GetDistanceBetweenCells(GridCell a, GridCell b)
         {
             Vector2Int aCoord = a.CoordAsVec2Int;
             Vector2Int bCoord = b.CoordAsVec2Int;
@@ -100,5 +98,7 @@ namespace Paint.Grid
 
             return 10 * distX + 10 * (distY - distX);
         }
+
+        bool CellIsNotWalkable(GridCell cell) => cell.CellType != GridCell.CellTypes.Normal || cell.HasObject;
     }
 }
