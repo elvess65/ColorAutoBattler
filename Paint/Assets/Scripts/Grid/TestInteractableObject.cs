@@ -66,6 +66,7 @@ public class MoveStrategy_Bezier : iMoveStrategy
     private MovePathController m_MovePathController;
     private Vector3 m_PositionAtLastPoint;
     private GridController m_Grid;
+    private PathCreator m_PathVisualizer;
 
     //Update position
     private float m_CurDistToUpdate;
@@ -78,7 +79,7 @@ public class MoveStrategy_Bezier : iMoveStrategy
     public MoveStrategy_Bezier(Transform controlledObject, GridController grid, float cellPositionUpdateDist)
     {
         m_MovePathController = new MovePathController(controlledObject);
-        m_MovePathController.OnMovementFinished += () => OnUpdatePosition?.Invoke(m_PositionAtLastPoint);
+        m_MovePathController.OnMovementFinished += MovementFinished;
 
         m_CellPositionUpdateDist = cellPositionUpdateDist;
         m_Grid = grid;
@@ -100,7 +101,8 @@ public class MoveStrategy_Bezier : iMoveStrategy
                 pathPos.Insert(1, (pathPos[0] + pathPos[1]) / 2);
 
             //Создать кривую по массиву точек
-            VertexPath vertexPath = GeneratePath(pathPos.ToArray());
+            BezierPath bezierPath = GenerateBezierPath(pathPos.ToArray());
+            VertexPath vertexPath = GenerateVertexPath(pathPos.ToArray());
 
             //Данные для обновления позиции при смене ячеек
             m_CellPositionUpdateDist = vertexPath.length / (path.Count - 1);
@@ -109,6 +111,10 @@ public class MoveStrategy_Bezier : iMoveStrategy
 
             //Текущая опорная позиция
             m_PositionAtLastPoint = m_MovePathController.ControlledTransform.position;
+
+            //Отображение пути
+            m_PathVisualizer = m_MovePathController.ControlledTransform.gameObject.AddComponent<PathCreator>();
+            m_PathVisualizer.bezierPath = bezierPath;
 
             //Начать движение
             m_MovePathController.StartMovement(vertexPath, 1f);
@@ -142,13 +148,21 @@ public class MoveStrategy_Bezier : iMoveStrategy
     }
 
 
-    VertexPath GeneratePath(Vector3[] points)
+    void MovementFinished()
+    {
+        OnUpdatePosition?.Invoke(m_PositionAtLastPoint);
+        MonoBehaviour.Destroy(m_PathVisualizer);
+    }
+
+    BezierPath GenerateBezierPath(Vector3[] points) => new BezierPath(points, false, PathSpace.xyz);
+
+    VertexPath GenerateVertexPath(Vector3[] points)
     {
         // Create a closed, 2D bezier path from the supplied points array
         // These points are treated as anchors, which the path will pass through
         // The control points for the path will be generated automatically
-        BezierPath bezierPath = new BezierPath(points, false, PathSpace.xyz);
+        //BezierPath bezierPath = new BezierPath(points, false, PathSpace.xyz);
         // Then create a vertex path from the bezier path, to be used for movement etc
-        return new VertexPath(bezierPath);
+        return new VertexPath(GenerateBezierPath(points));
     }
 }
