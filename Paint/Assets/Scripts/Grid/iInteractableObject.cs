@@ -18,7 +18,7 @@ namespace Paint.Grid.Movement
     {
         event System.Action<Vector3, Vector3, iMovableObject> OnUpdatePosition;
 
-        void SetMovePosition(Vector3 movePos, GridController gridController, float d);
+        void SetMovePosition(Vector3 movePos);
     }
 }
 
@@ -26,12 +26,11 @@ namespace Paint.Movement
 {
     public interface iMoveStrategy
     {
-        event System.Action OnUpdatePosition;
-        float DistanceToUpdate { get; set; }
+        event System.Action<Vector3> OnUpdatePosition;
         bool IsMoving { get; }
 
         void MoveToPosition(Vector3 pos);
-        void StopMove();
+        void StopMovement();
         void Update(float deltaTime);
     }
 }

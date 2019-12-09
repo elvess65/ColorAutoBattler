@@ -9,9 +9,9 @@ namespace FrameworkPackage.PathCreation
     public class MovePathController
     {
         public event System.Action OnMovementFinished;
+        public bool IsMoving { get; private set; }
 
         private VertexPath m_VertexPath;
-        private bool m_IsStarted = false;
         private float m_Speed;
         private float m_SpeedMltp;
 
@@ -38,13 +38,13 @@ namespace FrameworkPackage.PathCreation
             DistanceTravelled = 0;
             m_Speed = speed;
 
-            m_IsStarted = true;
+            IsMoving = true;
         }
 
         /// <summary>
         /// Остановить движение по пути
         /// </summary>
-        public void StopMovement() => m_IsStarted = false;
+        public void StopMovement() => IsMoving = false;
 
         /// <summary>
         /// Изменить множитель времени
@@ -53,7 +53,7 @@ namespace FrameworkPackage.PathCreation
 
         public void Update(float deltaTime)
         {
-            if (m_IsStarted)
+            if (IsMoving)
             {
                 DistanceTravelled += deltaTime * m_Speed * m_SpeedMltp;
 
@@ -62,7 +62,7 @@ namespace FrameworkPackage.PathCreation
 
                 if (DistanceTravelled >= m_VertexPath.length)
                 {
-                    m_IsStarted = false;
+                    IsMoving = false;
                     OnMovementFinished?.Invoke();
                 }
 

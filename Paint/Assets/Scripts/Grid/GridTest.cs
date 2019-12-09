@@ -32,7 +32,6 @@ namespace Paint.Grid
                     GridCell cell = m_Grid.GetCellByCoord(coord.x, coord.y);
                     if (cell.CellType == GridCell.CellTypes.Normal)
                     {
-
                         if (!cell.HasObject)
                         {
                             if (m_SelectedObject != null && m_SelectedObject.IsSelected)
@@ -43,15 +42,16 @@ namespace Paint.Grid
 
                             Vector3 cellPos = m_Grid.GetCellWorldPosByCoord(coord.x, coord.y);
 
+                            //Создать агент
                             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-
                             TestInteractableObject obj = cube.AddComponent<TestInteractableObject>();
-                            cube.transform.position = cellPos;
-                            cube.transform.localScale *= 0.5f;
-
-                            cell.AddObject(obj);
-
+                            obj.transform.position = cellPos;
+                            obj.transform.localScale *= 0.5f;
+                            obj.Init(cell.CellSize, m_Grid);
                             obj.OnUpdatePosition += UpdatePosition;
+
+                            //Расположить агент в ячейке
+                            cell.AddObject(obj);
                         }
                         else
                         {
@@ -99,7 +99,7 @@ namespace Paint.Grid
                     if (!cell.HasObject && cell.CellType == GridCell.CellTypes.Normal)
                     {
                         TestInteractableObject obj = m_SelectedObject as TestInteractableObject;
-                        obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(coord.x, coord.y), m_Grid, cell.CellSize);
+                        obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(coord.x, coord.y));
                     }
                 }
             }

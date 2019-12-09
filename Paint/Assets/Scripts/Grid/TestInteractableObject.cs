@@ -11,6 +11,13 @@ namespace Paint.Grid.Interaction
 {
     public class TestInteractableObject : MonoBehaviour, iMovableObject
     {
+        public void Init(float cellPositionUpdateDist, GridController gridController)
+        {
+            m_MoveStrategy = new MoveStrategy_Bezier(transform, gridController, cellPositionUpdateDist);
+            m_MoveStrategy.OnUpdatePosition += (Vector3 positionAtLastPoint) => OnUpdatePosition?.Invoke(positionAtLastPoint, transform.position, this);
+        }
+
+
         //iInteractable
         public bool IsSelected { get; private set; }
 
@@ -21,8 +28,6 @@ namespace Paint.Grid.Interaction
 
             IsSelected = true;
             GetComponent<Renderer>().material.color = Color.green;
-
-            Debug.Log("Select " + gameObject.name);
         }
 
         public void Unselect()
@@ -32,8 +37,6 @@ namespace Paint.Grid.Interaction
 
             IsSelected = false;
             GetComponent<Renderer>().material.color = Color.white;
-
-            Debug.Log("Unselect " + gameObject.name);
         }
 
 
@@ -42,13 +45,7 @@ namespace Paint.Grid.Interaction
 
         private iMoveStrategy m_MoveStrategy;
 
-
-        public void SetMovePosition(Vector3 movePos, GridController gridController, float d)
-        {
-            m_MoveStrategy = new MoveStrategy_Bezier(transform, gridController);
-            m_MoveStrategy.DistanceToUpdate = d;
-            m_MoveStrategy.MoveToPosition(movePos);
-        }
+        public void SetMovePosition(Vector3 movePos) => m_MoveStrategy.MoveToPosition(movePos);
     
 
         void Update()
@@ -61,39 +58,39 @@ namespace Paint.Grid.Interaction
 
 public class MoveStrategy_Bezier : iMoveStrategy
 {
-    public event Action OnUpdatePosition;
+    public event Action<Vector3> OnUpdatePosition;
 
-    public float DistanceToUpdate { get; set; }
-    public bool IsMoving { get; private set; }
+    public bool IsMoving => m_MovePathController.IsMoving;
 
     //Movement
     private MovePathController m_MovePathController;
-    private Vector3 m_AnchorPos;
+    private Vector3 m_PositionAtLastPoint;
+    private GridController m_Grid;
 
     //Update position
     private float m_CurDistToUpdate;
+    private float m_CellPositionUpdateDist;
     private float m_PassedDistanceSinceLastPoint;
-    private GridController m_Grid;
-
 
     private const float m_FIRST_UPDATE_DISTANCE_MULTIPLAYER = 0.6f;
 
 
-    public MoveStrategy_Bezier(Transform controlledObject, GridController grid)
+    public MoveStrategy_Bezier(Transform controlledObject, GridController grid, float cellPositionUpdateDist)
     {
         m_MovePathController = new MovePathController(controlledObject);
-        m_MovePathController.OnMovementFinished += MovementFinished;
+        m_MovePathController.OnMovementFinished += () => OnUpdatePosition?.Invoke(m_PositionAtLastPoint);
+
+        m_CellPositionUpdateDist = cellPositionUpdateDist;
         m_Grid = grid;
     }
 
     public void MoveToPosition(Vector3 targetPos)
     {
-        VertexPath vertexPath = null;
         List<GridCell> path = m_Grid.FindPath(m_Grid.GetCellByWorldPos(m_MovePathController.ControlledTransform.position),
                                               m_Grid.GetCellByWorldPos(targetPos));
         if (path != null)
         {
-            //Создать массив позиций, из которіх состоит путь
+            //Создать массив позиций, из которых состоит путь
             List<Vector3> pathPos = new List<Vector3>();
             for (int i = 0; i < path.Count; i++)
                 pathPos.Add(m_Grid.GetCellWorldPosByCoord(path[i].X, path[i].Y));
@@ -102,28 +99,23 @@ public class MoveStrategy_Bezier : iMoveStrategy
             if (pathPos.Count == 2)
                 pathPos.Insert(1, (pathPos[0] + pathPos[1]) / 2);
 
-            vertexPath = GeneratePath(pathPos.ToArray());
+            //Создать кривую по массиву точек
+            VertexPath vertexPath = GeneratePath(pathPos.ToArray());
+
+            //Данные для обновления позиции при смене ячеек
+            m_CellPositionUpdateDist = vertexPath.length / (path.Count - 1);
+            m_CurDistToUpdate = m_CellPositionUpdateDist * m_FIRST_UPDATE_DISTANCE_MULTIPLAYER;
+            m_PassedDistanceSinceLastPoint = 0;
+
+            //Текущая опорная позиция
+            m_PositionAtLastPoint = m_MovePathController.ControlledTransform.position;
+
+            //Начать движение
+            m_MovePathController.StartMovement(vertexPath, 1f);
         }
-
-        int pointsAtPath = path.Count;
-
-        m_AnchorPos = m_MovePathController.ControlledTransform.position;
-
-        DistanceToUpdate = vertexPath.length / (pointsAtPath - 1);
-
-        m_CurDistToUpdate = DistanceToUpdate * m_FIRST_UPDATE_DISTANCE_MULTIPLAYER;
-        m_PassedDistanceSinceLastPoint = 0;
-
-        Debug.Log("VERTEX PATH LENGTH: " + vertexPath.length + " Points at path: " + pointsAtPath + " DISTANCE TO UPDATE: " + DistanceToUpdate);
-
-        m_MovePathController.StartMovement(vertexPath, 1f);
-        IsMoving = true;
     }
 
-    public void StopMove()
-    {
-        throw new NotImplementedException();
-    }
+    public void StopMovement() => m_MovePathController.StopMovement();
 
     public void Update(float deltaTime)
     {
@@ -133,23 +125,22 @@ public class MoveStrategy_Bezier : iMoveStrategy
 
             //Обновление позиции ячейки
             float distTravelled = m_MovePathController.DistanceTravelled - m_PassedDistanceSinceLastPoint;
-            Debug.Log(distTravelled + " " + m_PassedDistanceSinceLastPoint);
+
             if (distTravelled >= m_CurDistToUpdate)
             {
+                //Каждый раз при прохождении необходимой для обновления дистанции "расстояние с последнего обновления" задаеться текущему пройденному расстоянию.
                 m_PassedDistanceSinceLastPoint = m_MovePathController.DistanceTravelled;
-                m_CurDistToUpdate = DistanceToUpdate;
+                //Текущее расстояние для обновления всегда после первого обновления изменяется на значение по-умолчанию (первое значение всегда меньше) 
+                m_CurDistToUpdate = m_CellPositionUpdateDist;
 
-                OnUpdatePosition?.Invoke();
+                OnUpdatePosition?.Invoke(m_PositionAtLastPoint);
+
+                //Текущая опорная позиция
+                m_PositionAtLastPoint = m_MovePathController.ControlledTransform.position;
             }
         }
     }
 
-
-    void MovementFinished()
-    {
-        IsMoving = false;
-        OnUpdatePosition?.Invoke();
-    }
 
     VertexPath GeneratePath(Vector3[] points)
     {
