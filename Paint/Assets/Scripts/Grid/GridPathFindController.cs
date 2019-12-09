@@ -10,7 +10,8 @@ namespace Paint.Grid
 
         public GridPathFindController(GridController gridController) => m_GridController = gridController;
     
-        public List<GridCell> FindPath(GridCell startNode, GridCell targetNode)
+
+        public List<GridCell> FindPath_GridCell(GridCell startNode, GridCell targetNode)
         {
             //Create open and close sets
             List<GridCell> openSet = new List<GridCell>();
@@ -65,6 +66,18 @@ namespace Paint.Grid
             }
 
             return null;
+        }
+
+        public Vector3[] FindPath_WorldCoord(GridCell startNode, GridCell targetNode)
+        {
+            List<GridCell> path = FindPath_GridCell(startNode, targetNode);
+
+            //Создать массив позиций, из которых состоит путь
+            List<Vector3> pathPos = new List<Vector3>();
+            for (int i = 0; i < path.Count; i++)
+                pathPos.Add(m_GridController.GetCellWorldPosByCoord(path[i].X, path[i].Y));
+
+            return pathPos.ToArray();
         }
 
 

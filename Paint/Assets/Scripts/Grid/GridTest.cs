@@ -1,7 +1,5 @@
 ﻿using Paint.Grid.Interaction;
 using Paint.Grid.Movement;
-using PathCreation;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Paint.Grid

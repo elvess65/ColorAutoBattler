@@ -67,7 +67,7 @@ namespace Paint.Grid
             }
         }
 
-        public List<GridCell> FindPath(GridCell startNode, GridCell targetNode) => m_GridPathFindController.FindPath(startNode, targetNode);
+        public List<GridCell> FindPath(GridCell startNode, GridCell targetNode) => m_GridPathFindController.FindPath_GridCell(startNode, targetNode);
 
 
         /// <summary>
