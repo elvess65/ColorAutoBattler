@@ -45,7 +45,7 @@ namespace Paint.Grid
                             TestInteractableObject obj = cube.AddComponent<TestInteractableObject>();
                             obj.transform.position = cellPos;
                             obj.transform.localScale *= 0.5f;
-                            obj.Init(cell.CellSize, m_Grid);
+                            obj.Init(cell.CellSize, m_Grid.FindPath);
                             obj.OnUpdatePosition += UpdatePosition;
 
                             //Расположить агент в ячейке
@@ -94,9 +94,21 @@ namespace Paint.Grid
                 {
                     GridCell cell = m_Grid.GetCellByCoord(coord.x, coord.y);
 
-                    if (!cell.HasObject && cell.CellType == GridCell.CellTypes.Normal)
+                    if (cell.CellType == GridCell.CellTypes.Normal)
                     {
                         TestInteractableObject obj = m_SelectedObject as TestInteractableObject;
+
+                        if (cell.HasObject)
+                        {
+                            GridCell fromCell = m_Grid.GetCellByWorldPos(obj.GetPosition);
+                            GridCell toCell = m_Grid.GetCellByCoord(coord.x, coord.y);
+                            GridCell closestWalkableCell = m_Grid.GetClosestWalkableCell(fromCell, toCell);
+
+                            Debug.Log("HAS OBJECT");
+
+                            return;
+                        }
+
                         obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(coord.x, coord.y));
                     }
                 }

@@ -41,7 +41,7 @@ namespace Paint.Grid
             int amountOfLowObstacles = m_NormalCells.Count * percentOfLowObstacles / 100;
             int amountOfHighObstacles = m_NormalCells.Count * mercentOfHighObstacles / 100;
 
-            while (amountOfLowObstacles > 0)
+            /*while (amountOfLowObstacles > 0)
             {
                 int randomIndex = Random.Range(0, m_NormalCells.Count);
 
@@ -64,10 +64,36 @@ namespace Paint.Grid
 
                 cell.SetCellType(GridCell.CellTypes.HighObstacle);
                 CreateDummyObstacle(PrimitiveType.Cylinder, GetCellWorldPosByCoord(cell.X, cell.Y));
-            }
+            }*/
         }
 
-        public List<GridCell> FindPath(GridCell startNode, GridCell targetNode) => m_GridPathFindController.FindPath_GridCell(startNode, targetNode);
+        public Vector3[] FindPath(Vector3 from, Vector3 to)
+        {
+            GridCell fromCell = GetCellByWorldPos(from);
+            GridCell targetCell = GetCellByWorldPos(to);
+
+            GridCell closestCell = GetClosestWalkableCell(fromCell, targetCell);
+            GameObject.CreatePrimitive(PrimitiveType.Capsule).transform.position = GetCellWorldPosByCoord(closestCell.X, closestCell.Y);
+            List<GridCell> gridPath = m_GridPathFindController.FindPath(fromCell, targetCell);
+
+            if (gridPath != null)
+            {
+                //Создать массив позиций, из которых состоит путь
+                List<Vector3> pathPos = new List<Vector3>();
+
+                //Перевести из сетки в мировые координаты
+                for (int i = 0; i < gridPath.Count; i++)
+                    pathPos.Add(GetCellWorldPosByCoord(gridPath[i].X, gridPath[i].Y));
+
+                //Исправление ошибки с путем состоящим из двух точек
+                if (pathPos.Count == 2)
+                    pathPos.Insert(1, (pathPos[0] + pathPos[1]) / 2);
+
+                return pathPos.ToArray();
+            }
+
+            return null;
+        }
 
 
         /// <summary>
@@ -91,6 +117,7 @@ namespace Paint.Grid
         }
 
 
+
         /// <summary>
         /// Получить расположение ячейки по координатам сетки
         /// </summary>
@@ -107,6 +134,7 @@ namespace Paint.Grid
         /// Получить координаты клетки по расположению
         /// </summary>
         public (int x, int y) GetCellCoordByWorldPos(Vector3 pos) => (Mathf.FloorToInt((pos - m_Offset).x / m_CellSize), Mathf.FloorToInt((pos - m_Offset).z / m_CellSize));
+
 
 
         /// <summary>
@@ -142,6 +170,61 @@ namespace Paint.Grid
         }
 
         /// <summary>
+        /// Список координат всех соседей для указанной координаты (3*3)
+        /// </summary>
+        public (int x, int y)[] GetCellNeighboursCoordInRange(int x, int y, int r)
+        {
+            //Если координата, для которой нужно получить список соседей не находится в пределах сетки - вернуть пустой список
+            if (!CoordIsOnGrid(x, y))
+                return new (int x, int y)[0];
+
+            //Список соседних координат относительно указанной
+            List<(int x, int y)> cellNeighbours = new List<(int x, int y)>();
+
+            for (int i = x - r; i <= x + r; i++)
+            {
+                for (int j = y - r; j <= y + r; j++)
+                {
+                    (int x, int y) neighbouCoord = (i, j);
+                    if (!(neighbouCoord.x.Equals(x) && neighbouCoord.y.Equals(y)) && CoordIsOnGrid(neighbouCoord.x, neighbouCoord.y))
+                        cellNeighbours.Add(neighbouCoord);
+                }
+            }
+
+
+            return cellNeighbours.ToArray();
+        }
+
+
+
+        /// <summary>
+        /// Ближайшая доступная для перемещения ячейка
+        /// </summary>
+        public GridCell GetClosestWalkableCell(GridCell fromCell, GridCell targetCell)
+        {
+            GridCell closestCell = null;
+            float distToClosestCell = float.MaxValue;
+            (int x, int y)[] targetCellNeighboursCoords = GetCellNeighboursCoordInRange(targetCell.X, targetCell.Y, 1);
+
+            foreach ((int x, int y) curNeighbourCellCoord in targetCellNeighboursCoords)
+            {
+                GridCell curNeighbourCell = GetCellByCoord(curNeighbourCellCoord.x, curNeighbourCellCoord.y);
+                if (CoordIsOnGrid(curNeighbourCellCoord.x, curNeighbourCellCoord.y) && 
+                   !CellIsNotWalkable(curNeighbourCell))
+                {
+                    float distToCell = GetDistanceBetweenCells(curNeighbourCell, fromCell);
+                    if (distToCell < distToClosestCell)
+                    {
+                        distToClosestCell = distToCell;
+                        closestCell = curNeighbourCell;
+                    }
+                }
+            }
+
+            return closestCell;
+        }
+
+        /// <summary>
         /// Выполнить событие для каждой ячейки
         /// </summary>
         /// <param name="forEachEvent">Событие, которое должно выполняться для каждой ячеки</param>
@@ -154,11 +237,20 @@ namespace Paint.Grid
             }
         }
 
+        /// <summary>
+        /// Расстояние между двумя ячейками
+        /// </summary>
+        public float GetDistanceBetweenCells(GridCell a, GridCell b) => Vector2Int.Distance(a.CoordAsVec2Int, b.CoordAsVec2Int);
 
         /// <summary>
         /// Находится ли указанная координата в пределах сетки
         /// </summary>
         public bool CoordIsOnGrid(int x, int y) => (x >= 0 && x < GridWidth) && (y >= 0 && y < GridHeight);
+
+        /// <summary>
+        /// Является ли ячейка доступной для перемещения
+        /// </summary>
+        public bool CellIsNotWalkable(GridCell cell) => cell.CellType != GridCell.CellTypes.Normal || cell.HasObject;
 
 
         void CreateDummyObstacle(PrimitiveType type, Vector3 pos)

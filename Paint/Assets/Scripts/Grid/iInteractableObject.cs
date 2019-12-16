@@ -18,6 +18,8 @@ namespace Paint.Grid.Movement
     {
         event System.Action<Vector3, Vector3, iMovableObject> OnUpdatePosition;
 
+        Vector3 GetPosition { get; }
+
         void SetMovePosition(Vector3 movePos);
     }
 }
@@ -28,6 +30,7 @@ namespace Paint.Movement
     {
         event System.Action<Vector3> OnUpdatePosition;
         bool IsMoving { get; }
+        Vector3 GetPosition { get; }
 
         void MoveToPosition(Vector3 pos);
         void StopMovement();

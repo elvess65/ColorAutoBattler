@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using FrameworkPackage.PathCreation;
-using Paint.Grid;
 using Paint.Grid.Movement;
 using Paint.Movement;
 using PathCreation;
@@ -11,9 +9,9 @@ namespace Paint.Grid.Interaction
 {
     public class TestInteractableObject : MonoBehaviour, iMovableObject
     {
-        public void Init(float cellPositionUpdateDist, GridController gridController)
+        public void Init(float cellPositionUpdateDist, Func<Vector3, Vector3, Vector3[]> getPathFunc)
         {
-            m_MoveStrategy = new MoveStrategy_Bezier(transform, gridController, cellPositionUpdateDist);
+            m_MoveStrategy = new MoveStrategy_Bezier(transform, getPathFunc, cellPositionUpdateDist);
             m_MoveStrategy.OnUpdatePosition += (Vector3 positionAtLastPoint) => OnUpdatePosition?.Invoke(positionAtLastPoint, transform.position, this);
         }
 
@@ -43,9 +41,14 @@ namespace Paint.Grid.Interaction
         //iMovableObject
         public event Action<Vector3, Vector3, iMovableObject> OnUpdatePosition;
 
+        public Vector3 GetPosition => m_MoveStrategy.GetPosition;
+
         private iMoveStrategy m_MoveStrategy;
 
+
         public void SetMovePosition(Vector3 movePos) => m_MoveStrategy.MoveToPosition(movePos);
+
+        public void StopMovement() => m_MoveStrategy.StopMovement();
     
 
         void Update()
@@ -61,12 +64,13 @@ public class MoveStrategy_Bezier : iMoveStrategy
     public event Action<Vector3> OnUpdatePosition;
 
     public bool IsMoving => m_MovePathController.IsMoving;
+    public Vector3 GetPosition => m_MovePathController.ControlledTransform.position;
 
     //Movement
     private MovePathController m_MovePathController;
-    private Vector3 m_PositionAtLastPoint;
-    private GridController m_Grid;
     private PathCreator m_PathVisualizer;
+    private Func<Vector3, Vector3, Vector3[]> m_GetPathFunc;
+    private Vector3 m_PositionAtLastPoint;
 
     //Update position
     private float m_CurDistToUpdate;
@@ -76,36 +80,26 @@ public class MoveStrategy_Bezier : iMoveStrategy
     private const float m_FIRST_UPDATE_DISTANCE_MULTIPLAYER = 0.6f;
 
 
-    public MoveStrategy_Bezier(Transform controlledObject, GridController grid, float cellPositionUpdateDist)
+    public MoveStrategy_Bezier(Transform controlledObject, Func<Vector3, Vector3, Vector3[]> getPathFunc, float cellPositionUpdateDist)
     {
         m_MovePathController = new MovePathController(controlledObject);
         m_MovePathController.OnMovementFinished += MovementFinished;
+        m_GetPathFunc = getPathFunc;
 
         m_CellPositionUpdateDist = cellPositionUpdateDist;
-        m_Grid = grid;
     }
 
     public void MoveToPosition(Vector3 targetPos)
     {
-        List<GridCell> path = m_Grid.FindPath(m_Grid.GetCellByWorldPos(m_MovePathController.ControlledTransform.position),
-                                              m_Grid.GetCellByWorldPos(targetPos));
+        Vector3[] path = m_GetPathFunc(m_MovePathController.ControlledTransform.position, targetPos);
         if (path != null)
         {
-            //Создать массив позиций, из которых состоит путь
-            List<Vector3> pathPos = new List<Vector3>();
-            for (int i = 0; i < path.Count; i++)
-                pathPos.Add(m_Grid.GetCellWorldPosByCoord(path[i].X, path[i].Y));
-
-            //Исправление ошибки с путем состоящим из двух точек
-            if (pathPos.Count == 2)
-                pathPos.Insert(1, (pathPos[0] + pathPos[1]) / 2);
-
             //Создать кривую по массиву точек
-            BezierPath bezierPath = GenerateBezierPath(pathPos.ToArray());
-            VertexPath vertexPath = GenerateVertexPath(pathPos.ToArray());
+            BezierPath bezierPath = GenerateBezierPath(path);
+            VertexPath vertexPath = GenerateVertexPath(path);
 
             //Данные для обновления позиции при смене ячеек
-            m_CellPositionUpdateDist = vertexPath.length / (path.Count - 1);
+            m_CellPositionUpdateDist = vertexPath.length / (path.Length - 1);   
             m_CurDistToUpdate = m_CellPositionUpdateDist * m_FIRST_UPDATE_DISTANCE_MULTIPLAYER;
             m_PassedDistanceSinceLastPoint = 0;
 

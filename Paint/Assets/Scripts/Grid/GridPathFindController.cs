@@ -11,7 +11,7 @@ namespace Paint.Grid
         public GridPathFindController(GridController gridController) => m_GridController = gridController;
     
 
-        public List<GridCell> FindPath_GridCell(GridCell startNode, GridCell targetNode)
+        public List<GridCell> FindPath(GridCell startNode, GridCell targetNode)
         {
             //Create open and close sets
             List<GridCell> openSet = new List<GridCell>();
@@ -45,7 +45,7 @@ namespace Paint.Grid
                 {
                     GridCell neighbourNode = m_GridController.GetCellByCoord(neighbours[i].x, neighbours[i].y);
 
-                    bool cellTypeIsIgnorable = CellIsNotWalkable(neighbourNode);
+                    bool cellTypeIsIgnorable = m_GridController.CellIsNotWalkable(neighbourNode);
 
                     //if neighbour is not walkable or is in closed set - skip
                     if (cellTypeIsIgnorable || closedSet.Contains(neighbourNode))
@@ -66,18 +66,6 @@ namespace Paint.Grid
             }
 
             return null;
-        }
-
-        public Vector3[] FindPath_WorldCoord(GridCell startNode, GridCell targetNode)
-        {
-            List<GridCell> path = FindPath_GridCell(startNode, targetNode);
-
-            //Создать массив позиций, из которых состоит путь
-            List<Vector3> pathPos = new List<Vector3>();
-            for (int i = 0; i < path.Count; i++)
-                pathPos.Add(m_GridController.GetCellWorldPosByCoord(path[i].X, path[i].Y));
-
-            return pathPos.ToArray();
         }
 
 
@@ -111,7 +99,5 @@ namespace Paint.Grid
 
             return 10 * distX + 10 * (distY - distX);
         }
-
-        bool CellIsNotWalkable(GridCell cell) => cell.CellType != GridCell.CellTypes.Normal || cell.HasObject;
     }
 }
