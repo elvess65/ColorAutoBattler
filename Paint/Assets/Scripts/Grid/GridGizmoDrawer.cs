@@ -30,6 +30,9 @@ namespace Paint.Grid
                 case GridCell.CellTypes.HighObstacle:
                     color = Color.red;
                     break;
+                case GridCell.CellTypes.FinishPathCell:
+                    color = Color.yellow;
+                    break;
             }
 
             Gizmos.color = cell.HasObject ? Color.green : color; 

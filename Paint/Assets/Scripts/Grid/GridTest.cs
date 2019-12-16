@@ -15,6 +15,7 @@ namespace Paint.Grid
         private const int m_PERCENT_OF_LOW_OBSTACLES = 20;
         private const int m_PERCENT_OF_HIGH_OBSTACLES = 15;
 
+
         void Start()
         {
             m_Grid = new GridController(5, 5, 1, Vector2.zero, m_PERCENT_OF_LOW_OBSTACLES, m_PERCENT_OF_HIGH_OBSTACLES);
@@ -45,8 +46,11 @@ namespace Paint.Grid
                             TestInteractableObject obj = cube.AddComponent<TestInteractableObject>();
                             obj.transform.position = cellPos;
                             obj.transform.localScale *= 0.5f;
+
                             obj.Init(cell.CellSize, m_Grid.FindPath);
                             obj.OnUpdatePosition += UpdatePosition;
+                            obj.OnSetTargetCell += SetTargetCell;
+                            obj.OnReleaseTargetCell += ReleaseTargetCell;
 
                             //Расположить агент в ячейке
                             cell.AddObject(obj);
@@ -66,7 +70,7 @@ namespace Paint.Grid
                     }
                 }
             }
-             /*
+
             if (Input.GetMouseButtonDown(1))
             {
                 if (RaycastInGrid(out (int x, int y) coord))
@@ -87,38 +91,38 @@ namespace Paint.Grid
                     }
                 }
             }
-             */
-            if (Input.GetMouseButtonDown(1))
+             
+            if (Input.GetMouseButtonDown(2))
             {
                 if (m_SelectedObject != null && RaycastInGrid(out (int x, int y) coord))
                 {
-                    //Get cell
-                    GridCell cell = m_Grid.GetCellByCoord(coord.x, coord.y);
+                    //Get target cell
+                    GridCell targetCell = m_Grid.GetCellByCoord(coord.x, coord.y);
 
                     //If cell is normal
-                    if (cell.CellType == GridCell.CellTypes.Normal)
+                    if (targetCell.CellType == GridCell.CellTypes.Normal)
                     {
+                        iMovableObject selectedObj = m_SelectedObject as iMovableObject;
                         Vector3 movePos = Vector3.zero;
-                        TestInteractableObject obj = m_SelectedObject as TestInteractableObject;
 
                         //Cell has object - find nearest walkable cell
-                        if (cell.HasObject)
+                        if (targetCell.HasObject)
                         {
-                            if (cell.GetObject() == m_SelectedObject)
+                            if (targetCell.GetObject() == m_SelectedObject)
                                 return;
 
-                            GridCell fromCell = m_Grid.GetCellByWorldPos(obj.GetPosition);
-                            GridCell closestWalkableCell = m_Grid.GetClosestWalkableCell(fromCell, cell, 1.5f);
+                            GridCell fromCell = m_Grid.GetCellByWorldPos(selectedObj.GetPosition);
+                            targetCell = m_Grid.GetClosestWalkableCell(fromCell, targetCell, 1.5f);
 
-                            if (closestWalkableCell != null)
-                                movePos = m_Grid.GetCellWorldPosByCoord(closestWalkableCell.X, closestWalkableCell.Y);
+                            if (targetCell != null)
+                                movePos = m_Grid.GetCellWorldPosByCoord(targetCell.X, targetCell.Y);
                             else
                                 return;
                         }
                         else
                             movePos = m_Grid.GetCellWorldPosByCoord(coord.x, coord.y);
 
-                        obj.SetMovePosition(movePos);
+                        selectedObj.SetMovePosition(movePos, targetCell.X, targetCell.Y);
                     }
                 }
             }
@@ -136,6 +140,10 @@ namespace Paint.Grid
                 toCell.AddObject(sender);
             }
         }
+
+        void ReleaseTargetCell(int x, int y) => m_Grid.GetCellByCoord(x, y).SetCellType(GridCell.CellTypes.Normal);
+
+        void SetTargetCell(int x, int y) => m_Grid.GetCellByCoord(x, y).SetCellType(GridCell.CellTypes.FinishPathCell);
 
         bool RaycastInGrid(out (int x, int y) coord)
         {

@@ -17,10 +17,12 @@ namespace Paint.Grid.Movement
     public interface iMovableObject : iInteractableObject
     {
         event System.Action<Vector3, Vector3, iMovableObject> OnUpdatePosition;
+        event System.Action<int, int> OnSetTargetCell;
+        event System.Action<int, int> OnReleaseTargetCell;
 
         Vector3 GetPosition { get; }
 
-        void SetMovePosition(Vector3 movePos);
+        void SetMovePosition(Vector3 movePos, int x, int y);
     }
 }
 
@@ -28,7 +30,7 @@ namespace Paint.Movement
 {
     public interface iMoveStrategy
     {
-        event System.Action<Vector3> OnUpdatePosition;
+        event System.Action<Vector3, bool> OnUpdatePosition;
         bool IsMoving { get; }
         Vector3 GetPosition { get; }
 

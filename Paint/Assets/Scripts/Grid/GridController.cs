@@ -269,7 +269,7 @@ namespace Paint.Grid
 
     public class GridCell
     {
-        public enum CellTypes { Normal, LowObstacle, HighObstacle }
+        public enum CellTypes { Normal, LowObstacle, HighObstacle, FinishPathCell }
         
         //Base
         public int X { get; private set; }

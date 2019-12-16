@@ -9,10 +9,25 @@ namespace Paint.Grid.Interaction
 {
     public class TestInteractableObject : MonoBehaviour, iMovableObject
     {
+        private (int x, int y) m_TargetCellCoord;
+        private iMoveStrategy m_MoveStrategy;
+
         public void Init(float cellPositionUpdateDist, Func<Vector3, Vector3, Vector3[]> getPathFunc)
         {
             m_MoveStrategy = new MoveStrategy_Bezier(transform, getPathFunc, cellPositionUpdateDist);
-            m_MoveStrategy.OnUpdatePosition += (Vector3 positionAtLastPoint) => OnUpdatePosition?.Invoke(positionAtLastPoint, transform.position, this);
+            m_MoveStrategy.OnUpdatePosition += (Vector3 positionAtLastPoint, bool movementFinished) =>
+            {
+                OnUpdatePosition?.Invoke(positionAtLastPoint, transform.position, this);
+
+                if (movementFinished)
+                    OnReleaseTargetCell?.Invoke(m_TargetCellCoord.x, m_TargetCellCoord.y);
+            };
+        }
+
+        void Update()
+        {
+            if (m_MoveStrategy != null && m_MoveStrategy.IsMoving)
+                m_MoveStrategy.Update(Time.deltaTime);
         }
 
 
@@ -39,29 +54,28 @@ namespace Paint.Grid.Interaction
 
 
         //iMovableObject
-        public event Action<Vector3, Vector3, iMovableObject> OnUpdatePosition;
+        public event Action<Vector3, Vector3, iMovableObject> OnUpdatePosition; //Событие обновления позиции объекта при перемещении
+        public event Action<int, int> OnSetTargetCell;      //Событие сохранения координат конечной ячейки
+        public event Action<int, int> OnReleaseTargetCell;  //Событие освобождения координат конечной ячейки
 
         public Vector3 GetPosition => m_MoveStrategy.GetPosition;
 
-        private iMoveStrategy m_MoveStrategy;
 
+        public void SetMovePosition(Vector3 movePos, int x, int y)
+        {
+            m_MoveStrategy.MoveToPosition(movePos);
 
-        public void SetMovePosition(Vector3 movePos) => m_MoveStrategy.MoveToPosition(movePos);
+            m_TargetCellCoord = (x, y);
+            OnSetTargetCell?.Invoke(x, y);
+        }
 
         public void StopMovement() => m_MoveStrategy.StopMovement();
-    
-
-        void Update()
-        {
-            if (m_MoveStrategy != null && m_MoveStrategy.IsMoving)
-                m_MoveStrategy.Update(Time.deltaTime);
-        }
     }
 }
 
 public class MoveStrategy_Bezier : iMoveStrategy
 {
-    public event Action<Vector3> OnUpdatePosition;
+    public event Action<Vector3, bool> OnUpdatePosition;
 
     public bool IsMoving => m_MovePathController.IsMoving;
     public Vector3 GetPosition => m_MovePathController.ControlledTransform.position;
@@ -83,7 +97,11 @@ public class MoveStrategy_Bezier : iMoveStrategy
     public MoveStrategy_Bezier(Transform controlledObject, Func<Vector3, Vector3, Vector3[]> getPathFunc, float cellPositionUpdateDist)
     {
         m_MovePathController = new MovePathController(controlledObject);
-        m_MovePathController.OnMovementFinished += MovementFinished;
+        m_MovePathController.OnMovementFinished += () =>
+        {
+            OnUpdatePosition?.Invoke(m_PositionAtLastPoint, true);
+            MonoBehaviour.Destroy(m_PathVisualizer);
+        };
         m_GetPathFunc = getPathFunc;
 
         m_CellPositionUpdateDist = cellPositionUpdateDist;
@@ -130,10 +148,11 @@ public class MoveStrategy_Bezier : iMoveStrategy
             {
                 //Каждый раз при прохождении необходимой для обновления дистанции "расстояние с последнего обновления" задаеться текущему пройденному расстоянию.
                 m_PassedDistanceSinceLastPoint = m_MovePathController.DistanceTravelled;
+
                 //Текущее расстояние для обновления всегда после первого обновления изменяется на значение по-умолчанию (первое значение всегда меньше) 
                 m_CurDistToUpdate = m_CellPositionUpdateDist;
 
-                OnUpdatePosition?.Invoke(m_PositionAtLastPoint);
+                OnUpdatePosition?.Invoke(m_PositionAtLastPoint, false);
 
                 //Текущая опорная позиция
                 m_PositionAtLastPoint = m_MovePathController.ControlledTransform.position;
@@ -141,12 +160,6 @@ public class MoveStrategy_Bezier : iMoveStrategy
         }
     }
 
-
-    void MovementFinished()
-    {
-        OnUpdatePosition?.Invoke(m_PositionAtLastPoint);
-        MonoBehaviour.Destroy(m_PathVisualizer);
-    }
 
     BezierPath GenerateBezierPath(Vector3[] points) => new BezierPath(points, false, PathSpace.xyz);
 
