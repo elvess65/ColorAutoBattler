@@ -41,7 +41,7 @@ namespace Paint.Grid
             int amountOfLowObstacles = m_NormalCells.Count * percentOfLowObstacles / 100;
             int amountOfHighObstacles = m_NormalCells.Count * mercentOfHighObstacles / 100;
 
-            /*while (amountOfLowObstacles > 0)
+            while (amountOfLowObstacles > 0)
             {
                 int randomIndex = Random.Range(0, m_NormalCells.Count);
 
@@ -64,17 +64,12 @@ namespace Paint.Grid
 
                 cell.SetCellType(GridCell.CellTypes.HighObstacle);
                 CreateDummyObstacle(PrimitiveType.Cylinder, GetCellWorldPosByCoord(cell.X, cell.Y));
-            }*/
+            }
         }
 
         public Vector3[] FindPath(Vector3 from, Vector3 to)
         {
-            GridCell fromCell = GetCellByWorldPos(from);
-            GridCell targetCell = GetCellByWorldPos(to);
-
-            GridCell closestCell = GetClosestWalkableCell(fromCell, targetCell);
-            GameObject.CreatePrimitive(PrimitiveType.Capsule).transform.position = GetCellWorldPosByCoord(closestCell.X, closestCell.Y);
-            List<GridCell> gridPath = m_GridPathFindController.FindPath(fromCell, targetCell);
+            List<GridCell> gridPath = m_GridPathFindController.FindPath(GetCellByWorldPos(from), GetCellByWorldPos(to));
 
             if (gridPath != null)
             {
@@ -200,18 +195,28 @@ namespace Paint.Grid
         /// <summary>
         /// Ближайшая доступная для перемещения ячейка
         /// </summary>
-        public GridCell GetClosestWalkableCell(GridCell fromCell, GridCell targetCell)
+        public GridCell GetClosestWalkableCell(GridCell fromCell, GridCell targetCell, float rangeToFindClosest)
         {
+            //If cells are neighbours - do nothing
+            float distBetweenCells = GetDistanceBetweenCells(fromCell, targetCell);
+            if (distBetweenCells <= rangeToFindClosest)
+                return null;
+
             GridCell closestCell = null;
             float distToClosestCell = float.MaxValue;
+
+            //Get list of cell neighbours
             (int x, int y)[] targetCellNeighboursCoords = GetCellNeighboursCoordInRange(targetCell.X, targetCell.Y, 1);
 
+            //Loop through cell neighbours
             foreach ((int x, int y) curNeighbourCellCoord in targetCellNeighboursCoords)
             {
                 GridCell curNeighbourCell = GetCellByCoord(curNeighbourCellCoord.x, curNeighbourCellCoord.y);
-                if (CoordIsOnGrid(curNeighbourCellCoord.x, curNeighbourCellCoord.y) && 
-                   !CellIsNotWalkable(curNeighbourCell))
+
+                //If neighbour is walkable
+                if (!CellIsNotWalkable(curNeighbourCell))
                 {
+                    //If neigbout is the closest 
                     float distToCell = GetDistanceBetweenCells(curNeighbourCell, fromCell);
                     if (distToCell < distToClosestCell)
                     {

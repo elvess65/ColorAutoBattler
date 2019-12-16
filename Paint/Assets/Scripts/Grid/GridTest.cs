@@ -66,7 +66,7 @@ namespace Paint.Grid
                     }
                 }
             }
-
+             /*
             if (Input.GetMouseButtonDown(1))
             {
                 if (RaycastInGrid(out (int x, int y) coord))
@@ -87,29 +87,38 @@ namespace Paint.Grid
                     }
                 }
             }
-
-            if (Input.GetMouseButtonDown(2))
+             */
+            if (Input.GetMouseButtonDown(1))
             {
                 if (m_SelectedObject != null && RaycastInGrid(out (int x, int y) coord))
                 {
+                    //Get cell
                     GridCell cell = m_Grid.GetCellByCoord(coord.x, coord.y);
 
+                    //If cell is normal
                     if (cell.CellType == GridCell.CellTypes.Normal)
                     {
+                        Vector3 movePos = Vector3.zero;
                         TestInteractableObject obj = m_SelectedObject as TestInteractableObject;
 
+                        //Cell has object - find nearest walkable cell
                         if (cell.HasObject)
                         {
+                            if (cell.GetObject() == m_SelectedObject)
+                                return;
+
                             GridCell fromCell = m_Grid.GetCellByWorldPos(obj.GetPosition);
-                            GridCell toCell = m_Grid.GetCellByCoord(coord.x, coord.y);
-                            GridCell closestWalkableCell = m_Grid.GetClosestWalkableCell(fromCell, toCell);
+                            GridCell closestWalkableCell = m_Grid.GetClosestWalkableCell(fromCell, cell, 1.5f);
 
-                            Debug.Log("HAS OBJECT");
-
-                            return;
+                            if (closestWalkableCell != null)
+                                movePos = m_Grid.GetCellWorldPosByCoord(closestWalkableCell.X, closestWalkableCell.Y);
+                            else
+                                return;
                         }
+                        else
+                            movePos = m_Grid.GetCellWorldPosByCoord(coord.x, coord.y);
 
-                        obj.SetMovePosition(m_Grid.GetCellWorldPosByCoord(coord.x, coord.y));
+                        obj.SetMovePosition(movePos);
                     }
                 }
             }
