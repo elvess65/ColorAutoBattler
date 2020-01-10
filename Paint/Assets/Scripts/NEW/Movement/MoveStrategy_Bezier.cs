@@ -46,6 +46,9 @@ namespace Paint.Movement
             Vector3[] path = m_GetPathFunc(m_MovePathController.ControlledTransform.position, targetPos);
             if (path != null)
             {
+                //Заменить начальную точку движения с позиции клетки на позициию персонажа
+                path[0] = m_MovePathController.ControlledTransform.position;
+
                 //Создать кривую по массиву точек
                 BezierPath bezierPath = GenerateBezierPath(path);
                 VertexPath vertexPath = GenerateVertexPath(path);

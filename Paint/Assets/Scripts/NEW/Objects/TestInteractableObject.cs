@@ -27,7 +27,7 @@ namespace Paint.Objects
                 //Call only when movement was finished
                 if (movementFinished)
                 {
-                    OnReleaseTargetCell?.Invoke(m_TargetCellCoord.x, m_TargetCellCoord.y);
+                    ReleaseTargetCell();
 
                     m_OnMovementFinished?.Invoke();
                     m_OnMovementFinished = null;
@@ -97,14 +97,17 @@ namespace Paint.Objects
         public event Action<int, int> OnReleaseTargetCell;                      //Событие освобождения координат конечной ячейки
 
         private event Action m_OnMovementFinished;                              //Внутренее событие окончания движения
-
-        private (int x, int y) m_TargetCellCoord;                               //Целевая ячейка перемещения (чтобы освободить по прибитии)
+        private (int x, int y) m_TargetCellCoord = (-1, -1);                    //Целевая ячейка перемещения (чтобы освободить по прибитии)
 
 
         void SetMovePosition(Vector3 movePos, int x, int y, Action onMovementFinishedFunc)
         {
             if (m_MoveStrategy.MoveToPosition(movePos))
             {
+                //Освободить целевую ячейку если она не была освобождена до начала перемещения
+                if (!TargetCellIsReleased())
+                    ReleaseTargetCell();
+
                 m_TargetCellCoord = (x, y);
                 m_OnMovementFinished += onMovementFinishedFunc;
 
@@ -113,6 +116,14 @@ namespace Paint.Objects
         }
 
         void StopMovement() => m_MoveStrategy.StopMovement();
+
+        void ReleaseTargetCell()
+        {
+            OnReleaseTargetCell?.Invoke(m_TargetCellCoord.x, m_TargetCellCoord.y);
+            m_TargetCellCoord = (-1, -1);
+        }
+
+        bool TargetCellIsReleased() => m_TargetCellCoord.x < 0 && m_TargetCellCoord.y < 0;
 
 
         //iBattleObject
@@ -147,7 +158,6 @@ namespace Paint.Objects
                 Debug.Log("Attack target");
             }
         }
-
 
         bool CanAttackTarget(iBattleObject target)
         {
