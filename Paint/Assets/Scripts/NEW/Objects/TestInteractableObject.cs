@@ -10,6 +10,7 @@ namespace Paint.Objects
 {
     public class TestUnitObject : MonoBehaviour, iMovableObject, iBattleObject
     {
+        //Object
         private iMoveStrategy m_MoveStrategy;
         private iObjectBattleProcessor m_BattleProcessor;
 
@@ -99,7 +100,7 @@ namespace Paint.Objects
         //iMovableObject
         public event Action<Vector3, Vector3, iMovableObject> OnUpdatePosition; //Событие обновления позиции объекта при перемещении
 
-        private event Action m_OnMovementFinished;                              //Внутренее событие окончания движения
+        private event Action m_OnMovementFinished;                              //Внутренее событие окончания движения (для команд)
         private (int x, int y) m_TargetCellCoord = (-1, -1);                    //Целевая ячейка перемещения (чтобы освободить по прибитии)
 
 
@@ -121,13 +122,13 @@ namespace Paint.Objects
 
         void SetTargetCell(int x, int y)
         {
-            GridTest.Instance.GridController.GetCellByCoord(x, y).SetCellType(Grid.GridCell.CellTypes.FinishPathCell);
+            GameManager.Instance.GridController.GetCellByCoord(x, y).SetCellType(Grid.GridCell.CellTypes.FinishPathCell);
             m_TargetCellCoord = (x, y);
         }
 
         void ReleaseTargetCell()
         {
-            GridTest.Instance.GridController.GetCellByCoord(m_TargetCellCoord.x, m_TargetCellCoord.y).SetCellType(Grid.GridCell.CellTypes.Normal);
+            GameManager.Instance.GridController.GetCellByCoord(m_TargetCellCoord.x, m_TargetCellCoord.y).SetCellType(Grid.GridCell.CellTypes.Normal);
             m_TargetCellCoord = (-1, -1);
         }
 

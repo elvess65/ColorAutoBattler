@@ -8,9 +8,9 @@ using UnityEngine;
 
 namespace Paint.Logic
 {
-    public class GridTest : MonoBehaviour
+    public class GameManager : MonoBehaviour
     {
-        public static GridTest Instance;
+        public static GameManager Instance;
 
         public GridGizmoDrawer GridGizmoDrawer;
         public LayerMask GroundLayer;

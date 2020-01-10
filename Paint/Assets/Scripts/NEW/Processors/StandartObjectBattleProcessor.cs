@@ -62,8 +62,8 @@ namespace Paint.Processors
 
         bool CanAttackTarget(iBattleObject target)
         {
-            GridCell fromCell = GridTest.Instance.GridController.GetCellByWorldPos(m_ControlledObject.GetPosition);
-            GridCell targetCell = GridTest.Instance.GridController.GetCellByWorldPos(target.GetPosition);
+            GridCell fromCell = GameManager.Instance.GridController.GetCellByWorldPos(m_ControlledObject.GetPosition);
+            GridCell targetCell = GameManager.Instance.GridController.GetCellByWorldPos(target.GetPosition);
 
             if (!TargetIsInAttackRange(fromCell, targetCell))
             {
@@ -78,10 +78,10 @@ namespace Paint.Processors
                     m_TargetLastCell = targetCell;
 
                     //Find closest cell
-                    GridCell closestCell = GridTest.Instance.GridController.GetClosestWalkableCell(fromCell, targetCell, m_AttackDistance + m_DIAGONAL_CELL_DIST_OFFSET);
+                    GridCell closestCell = GameManager.Instance.GridController.GetClosestWalkableCell(fromCell, targetCell, m_AttackDistance + m_DIAGONAL_CELL_DIST_OFFSET);
                     if (closestCell != null)
                     {
-                        iCommand subCommand = new MoveCommand(GridTest.Instance.GridController.GetCellWorldPosByCoord(closestCell.X, closestCell.Y),
+                        iCommand subCommand = new MoveCommand(GameManager.Instance.GridController.GetCellWorldPosByCoord(closestCell.X, closestCell.Y),
                                                                 closestCell.X, closestCell.Y,
                                                                 () => TryAttackTarget());
 
@@ -100,6 +100,6 @@ namespace Paint.Processors
             return true;
         }
 
-        bool TargetIsInAttackRange(GridCell fromCell, GridCell targetCell) => (int)GridTest.Instance.GridController.GetDistanceBetweenCells(fromCell, targetCell) == m_AttackDistance;
+        bool TargetIsInAttackRange(GridCell fromCell, GridCell targetCell) => (int)GameManager.Instance.GridController.GetDistanceBetweenCells(fromCell, targetCell) == m_AttackDistance;
     }
 }
