@@ -49,24 +49,7 @@ namespace Paint.Logic
                 if (RaycastInGrid(out (int x, int y) coord))
                 {
                     GridCell cell = GridController.GetCellByCoord(coord.x, coord.y);
-                    if (cell.CellType == GridCell.CellTypes.Normal && !cell.HasObject)
-                    {
-                        Vector3 cellPos = GridController.GetCellWorldPosByCoord(cell.X, cell.Y);
-
-                        //Создать агент
-                        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        TestUnitObject obj = cube.AddComponent<TestUnitObject>();
-                        obj.transform.position = cellPos;
-                        obj.transform.localScale *= 0.5f;
-
-                        iMoveStrategy moveStrategy = new MoveStrategy_Bezier(obj.transform, GridController.FindPath, cell.CellSize);
-
-                        obj.Init(ObjectTypes.ControlledObject, moveStrategy);
-                        obj.OnUpdatePosition += UpdatePosition;
-
-                        //Расположить агент в ячейке
-                        cell.AddObject(obj);
-                    }
+                    CreateObject(cell, false);
                 }
             }
              
@@ -75,28 +58,7 @@ namespace Paint.Logic
                 if (RaycastInGrid(out (int x, int y) coord))
                 {
                     GridCell cell = GridController.GetCellByCoord(coord.x, coord.y);
-                    if (cell.CellType == GridCell.CellTypes.Normal && !cell.HasObject)
-                    {
-                        Vector3 cellPos = GridController.GetCellWorldPosByCoord(cell.X, cell.Y);
-
-                        //Создать агент
-                        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                        cube.GetComponent<MeshRenderer>().material.color = Color.red;
-
-                        TestUnitObject obj = cube.AddComponent<TestUnitObject>();
-                        obj.transform.position = cellPos;
-                        obj.transform.localScale *= 0.5f;
-
-                        iMoveStrategy moveStrategy = new MoveStrategy_Bezier(obj.transform, GridController.FindPath, cell.CellSize);
-
-                        obj.Init(ObjectTypes.EnemyObject, moveStrategy);
-                        obj.OnUpdatePosition += UpdatePosition;
-
-                        //Расположить агент в ячейке
-                        cell.AddObject(obj);
-
-                        m_Enemy_Object = obj;
-                    }
+                    CreateObject(cell, true);
                 }
             }
 
@@ -215,6 +177,34 @@ namespace Paint.Logic
             {
                 fromCell.RemoveObject();
                 toCell.AddObject(sender);
+            }
+        }
+
+        void CreateObject(GridCell cell, bool isEnemy)
+        {
+            if (cell.CellType == GridCell.CellTypes.Normal && !cell.HasObject)
+            {
+                Vector3 cellPos = GridController.GetCellWorldPosByCoord(cell.X, cell.Y);
+
+                //Создать агент
+                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                TestUnitObject obj = cube.AddComponent<TestUnitObject>();
+                obj.transform.position = cellPos;
+                obj.transform.localScale *= 0.5f;
+
+                iMoveStrategy moveStrategy = new MoveStrategy_Bezier(obj.transform, GridController.FindPath, cell.CellSize);
+
+                obj.Init(isEnemy ? ObjectTypes.EnemyObject : ObjectTypes.ControlledObject, moveStrategy);
+                obj.OnUpdatePosition += UpdatePosition;
+
+                //Расположить агент в ячейке
+                cell.AddObject(obj);
+
+                if (isEnemy)
+                {
+                    cube.GetComponent<MeshRenderer>().material.color = Color.red;
+                    m_Enemy_Object = obj;
+                }
             }
         }
 
