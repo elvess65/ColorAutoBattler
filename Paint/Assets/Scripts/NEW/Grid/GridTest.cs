@@ -107,7 +107,7 @@ namespace Paint.Logic
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 GridCell enemyCell = GridController.GetCellByWorldPos(m_Enemy_Object.GetPosition);
-                (int x, int y)[] cells = GridController.GetWalkableCellNeighboursCoordInRange(enemyCell.X, enemyCell.Y, 1);
+                (int x, int y)[] cells = GridController.GetWalkableCellNeighboursCoordInRange(enemyCell.X, enemyCell.Y, Random.Range(1, 4));
                 int randomIndex = Random.Range(0, cells.Length);
                 GridCell moveCell = GridController.GetCellByCoord(cells[randomIndex].x, cells[randomIndex].y);
                 Vector3 movePos = GridController.GetCellWorldPosByCoord(moveCell.X, moveCell.Y);
