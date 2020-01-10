@@ -1,9 +1,9 @@
 ﻿using System;
 using Paint.Commands;
-using Paint.Grid;
 using Paint.Logic;
 using Paint.Movement;
 using Paint.Objects.Interfaces;
+using Paint.Processors;
 using UnityEngine;
 
 namespace Paint.Objects
@@ -11,6 +11,7 @@ namespace Paint.Objects
     public class TestUnitObject : MonoBehaviour, iMovableObject, iBattleObject
     {
         private iMoveStrategy m_MoveStrategy;
+        private iObjectBattleProcessor m_BattleProcessor;
 
         public void Init(ObjectTypes objectType, iMoveStrategy moveStrategy)
         {
@@ -35,14 +36,17 @@ namespace Paint.Objects
             };
 
             //Battle
-        }
+            m_BattleProcessor = new StandartObjectBattleProcessor(this, m_AttackDistance);
+            m_BattleProcessor.OnAttack += AttackTarget;
+        }        
 
         void Update()
         {
             if (m_MoveStrategy != null && m_MoveStrategy.IsMoving)
                 m_MoveStrategy.Update(Time.deltaTime);
 
-            ProcessAttack();
+            if (m_BattleProcessor != null)
+                m_BattleProcessor.ProcessAttack();
         }
 
 
@@ -79,12 +83,13 @@ namespace Paint.Objects
 
                     MoveCommand moveCommand = command as MoveCommand;
                     SetMovePosition(moveCommand.MovePos, moveCommand.TargetCellCoord.x, moveCommand.TargetCellCoord.y, moveCommand.OnMovementFinished);
+
                     break;
 
                 case CommandTypes.AttackCommand:
 
                     AttackCommand attackCommand = command as AttackCommand;
-                    m_Target = attackCommand.Target;
+                    m_BattleProcessor.SetTarget(attackCommand.Target);
 
                     break;
             }
@@ -93,8 +98,6 @@ namespace Paint.Objects
 
         //iMovableObject
         public event Action<Vector3, Vector3, iMovableObject> OnUpdatePosition; //Событие обновления позиции объекта при перемещении
-        public event Action<int, int> OnSetTargetCell;                          //Событие сохранения координат конечной ячейки
-        public event Action<int, int> OnReleaseTargetCell;                      //Событие освобождения координат конечной ячейки
 
         private event Action m_OnMovementFinished;                              //Внутренее событие окончания движения
         private (int x, int y) m_TargetCellCoord = (-1, -1);                    //Целевая ячейка перемещения (чтобы освободить по прибитии)
@@ -108,18 +111,23 @@ namespace Paint.Objects
                 if (!TargetCellIsReleased())
                     ReleaseTargetCell();
 
-                m_TargetCellCoord = (x, y);
-                m_OnMovementFinished += onMovementFinishedFunc;
+                SetTargetCell(x, y);
 
-                OnSetTargetCell?.Invoke(x, y);
+                m_OnMovementFinished += onMovementFinishedFunc;
             }
         }
 
         void StopMovement() => m_MoveStrategy.StopMovement();
 
+        void SetTargetCell(int x, int y)
+        {
+            GridTest.Instance.GridController.GetCellByCoord(x, y).SetCellType(Grid.GridCell.CellTypes.FinishPathCell);
+            m_TargetCellCoord = (x, y);
+        }
+
         void ReleaseTargetCell()
         {
-            OnReleaseTargetCell?.Invoke(m_TargetCellCoord.x, m_TargetCellCoord.y);
+            GridTest.Instance.GridController.GetCellByCoord(m_TargetCellCoord.x, m_TargetCellCoord.y).SetCellType(Grid.GridCell.CellTypes.Normal);
             m_TargetCellCoord = (-1, -1);
         }
 
@@ -127,77 +135,11 @@ namespace Paint.Objects
 
 
         //iBattleObject
-        private iBattleObject m_Target;
-
-        private float m_LeftTimeToDistanceCheck = 0;
-        private float m_DistanceCheckTime = 0.5f;
         private int m_AttackDistance = 1;
-        private GridCell m_TargetLastCell = null;
 
-        private const float m_DIAGONAL_CELL_DIST_OFFSET = 0.5f;
-
-
-        void ProcessAttack()
+        void AttackTarget(iBattleObject target)
         {
-            if (m_Target != null)
-            {
-                m_LeftTimeToDistanceCheck -= Time.deltaTime;
-
-                if (m_LeftTimeToDistanceCheck <= 0)
-                {
-                    m_LeftTimeToDistanceCheck = m_DistanceCheckTime;
-                    TryAttackTarget();
-                }
-            }
+            Debug.Log("Attack : " + target.GetTransform.gameObject);
         }
-
-        void TryAttackTarget()
-        {
-            if (CanAttackTarget(m_Target))
-            {
-                Debug.Log("Attack target");
-            }
-        }
-
-        bool CanAttackTarget(iBattleObject target)
-        {
-            GridCell fromCell = GridTest.Instance.GridController.GetCellByWorldPos(GetPosition);
-            GridCell targetCell = GridTest.Instance.GridController.GetCellByWorldPos(target.GetPosition);
-
-            if (!TargetIsInAttackRange(fromCell, targetCell))
-            {
-                Debug.Log("Target is out of range");
-
-                //Если позиция цели еще ни разу не кешировалась или цель переместилась - найти ближайшую к цели доступную для перемещения ячейку 
-                if (m_TargetLastCell == null || (targetCell != m_TargetLastCell))
-                {
-                    Debug.Log("Trying to find closest walkable cell");
-
-                    //Cache last target cell
-                    m_TargetLastCell = targetCell;
-                    
-                    //Find closest cell
-                    GridCell closestCell = GridTest.Instance.GridController.GetClosestWalkableCell(fromCell, targetCell, m_AttackDistance + m_DIAGONAL_CELL_DIST_OFFSET);
-                    if (closestCell != null)
-                    {
-                        iCommand subCommand = new MoveCommand(GridTest.Instance.GridController.GetCellWorldPosByCoord(closestCell.X, closestCell.Y),
-                                                              closestCell.X, closestCell.Y, 
-                                                              () => TryAttackTarget());
-                        ExecuteCommand(subCommand);
-
-                        return false;
-                    }
-                }
-
-                //В противном случае продолжать движение
-                Debug.Log("Target didnt move. Continue movement");
-
-                return false;
-            }
-
-            return true;
-        }
-
-        bool TargetIsInAttackRange(GridCell fromCell, GridCell targetCell) => (int)GridTest.Instance.GridController.GetDistanceBetweenCells(fromCell, targetCell) == m_AttackDistance;
     }
 }

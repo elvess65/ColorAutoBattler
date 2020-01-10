@@ -63,8 +63,6 @@ namespace Paint.Logic
 
                         obj.Init(ObjectTypes.ControlledObject, moveStrategy);
                         obj.OnUpdatePosition += UpdatePosition;
-                        obj.OnSetTargetCell += SetTargetCell;
-                        obj.OnReleaseTargetCell += ReleaseTargetCell;
 
                         //Расположить агент в ячейке
                         cell.AddObject(obj);
@@ -93,8 +91,6 @@ namespace Paint.Logic
 
                         obj.Init(ObjectTypes.EnemyObject, moveStrategy);
                         obj.OnUpdatePosition += UpdatePosition;
-                        obj.OnSetTargetCell += SetTargetCell;
-                        obj.OnReleaseTargetCell += ReleaseTargetCell;
 
                         //Расположить агент в ячейке
                         cell.AddObject(obj);
@@ -221,10 +217,6 @@ namespace Paint.Logic
                 toCell.AddObject(sender);
             }
         }
-
-        void ReleaseTargetCell(int x, int y) => GridController.GetCellByCoord(x, y).SetCellType(GridCell.CellTypes.Normal);
-
-        void SetTargetCell(int x, int y) => GridController.GetCellByCoord(x, y).SetCellType(GridCell.CellTypes.FinishPathCell);
 
         bool RaycastInGrid(out (int x, int y) coord)
         {
