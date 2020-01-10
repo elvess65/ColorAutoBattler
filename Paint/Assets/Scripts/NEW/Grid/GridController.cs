@@ -40,7 +40,7 @@ namespace Paint.Grid
             int amountOfLowObstacles = m_NormalCells.Count * percentOfLowObstacles / 100;
             int amountOfHighObstacles = m_NormalCells.Count * mercentOfHighObstacles / 100;
 
-            while (amountOfLowObstacles > 0)
+           /* while (amountOfLowObstacles > 0)
             {
                 int randomIndex = Random.Range(0, m_NormalCells.Count);
 
@@ -63,7 +63,7 @@ namespace Paint.Grid
 
                 cell.SetCellType(GridCell.CellTypes.HighObstacle);
                 CreateDummyObstacle(PrimitiveType.Cylinder, GetCellWorldPosByCoord(cell.X, cell.Y));
-            }
+            }*/
         }
 
         public Vector3[] FindPath(Vector3 from, Vector3 to)
@@ -189,6 +189,17 @@ namespace Paint.Grid
             return cellNeighbours.ToArray();
         }
 
+        public (int x, int y)[] GetWalkableCellNeighboursCoordInRange(int x, int y, int r)
+        {
+            List<(int x, int y)> cellNeighbours = new List<(int x, int y)>(GetCellNeighboursCoordInRange(x, y, r));
+            for (int i = 0; i < cellNeighbours.Count; i++)
+            {
+                if (CellIsNotWalkable(GetCellByCoord(cellNeighbours[i].x, cellNeighbours[i].y)))
+                    cellNeighbours.RemoveAt(i--);
+            }
+
+            return cellNeighbours.ToArray();
+        }
 
 
         /// <summary>
@@ -205,7 +216,7 @@ namespace Paint.Grid
             float distToClosestCell = float.MaxValue;
 
             //Get list of cell neighbours
-            (int x, int y)[] targetCellNeighboursCoords = GetCellNeighboursCoordInRange(targetCell.X, targetCell.Y, 1);
+            (int x, int y)[] targetCellNeighboursCoords = GetCellNeighboursCoordInRange(targetCell.X, targetCell.Y, (int)rangeToFindClosest);
 
             //Loop through cell neighbours
             foreach ((int x, int y) curNeighbourCellCoord in targetCellNeighboursCoords)

@@ -1,5 +1,4 @@
-﻿using Paint.Grid;
-using Paint.Objects.Interfaces;
+﻿using Paint.Objects.Interfaces;
 using UnityEngine;
 
 namespace Paint.Commands

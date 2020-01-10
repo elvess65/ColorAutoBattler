@@ -23,6 +23,8 @@ namespace Paint.Logic
 
         public GridController GridController { get; private set; }
 
+        private TestUnitObject m_Enemy_Object;
+
 
         void Awake()
         {
@@ -96,8 +98,20 @@ namespace Paint.Logic
 
                         //Расположить агент в ячейке
                         cell.AddObject(obj);
+
+                        m_Enemy_Object = obj;
                     }
                 }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                GridCell enemyCell = GridController.GetCellByWorldPos(m_Enemy_Object.GetPosition);
+                (int x, int y)[] cells = GridController.GetWalkableCellNeighboursCoordInRange(enemyCell.X, enemyCell.Y, 1);
+                int randomIndex = Random.Range(0, cells.Length);
+                GridCell moveCell = GridController.GetCellByCoord(cells[randomIndex].x, cells[randomIndex].y);
+                Vector3 movePos = GridController.GetCellWorldPosByCoord(moveCell.X, moveCell.Y);
+                m_Enemy_Object.ExecuteCommand(new MoveCommand(movePos, moveCell.X, moveCell.Y));
             }
         }
 
